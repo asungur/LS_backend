@@ -21,16 +21,17 @@ def valid_number?(num)
 end
 
 def operation_to_message(op)
-  op = case op
-  when '1'
-    'Adding'
-  when '2'
-    'Subtracting'
-  when '3'
-    'Multiplying'
-  when '4'
-    'Dividing'
-  end
+  op =
+    case op
+    when '1'
+      'Adding'
+    when '2'
+      'Subtracting'
+    when '3'
+      'Multiplying'
+    when '4'
+      'Dividing'
+    end
   op
 end
 
@@ -74,7 +75,15 @@ loop do # main loop
     end
   end
 
-  prompt1('operator_prompt')
+  operator_prompt = <<-MSG
+  What operation would you like to perform?
+  1) add
+  2) subtract
+  3) multiply
+  4) divide
+  MSG
+
+  prompt2(operator_prompt)
 
   operator = ''
   loop do
@@ -86,14 +95,6 @@ loop do # main loop
       prompt1('validate_op')
     end
   end
-
-  operator_prompt= <<-MSG
-  What operation would you like to perform?
-  1) add
-  2) subtract
-  3) multiply
-  4) divide
-  MSG
 
   prompt2("#{operation_to_message(operator)} the two numbers...")
 
