@@ -1,0 +1,18 @@
+en:
+  welcome: "Welcome to Calculator Enter your name:"
+  no_name: "Make sure to use a valid name."
+  ask_num_1: "What's the first number?"
+  ask_num_2: "What's the second number?"
+  invalid_num: "The number is not valid!"
+  validate_op: "Must choose 1, 2, 3, 4"
+  reoperate: "Do you want to perform another calculation? (Y to calculate again)"
+  exit_msg: "Thank you for using the calculator. Good bye!"
+tr:
+  welcome: "Hesap makinasina hosgeldiniz. Isminiz nedir:"
+  no_name: "Lutfen gecerli bir isim giriniz."
+  ask_num_1: "Ilk sayiyi giriniz?"
+  ask_num_2: "Ikinci sayiyi giriniz?"
+  invalid_num: "Girdiginiz sayi gecerli degil!"
+  validate_op: "1, 2, 3, 4 sayilarindan birini giriniz"
+  reoperate: "Baska bir islem yapmak ister misiniz? (Evet icin Y)"
+  exit_msg: "Hesap makinasini kullandiginiz icin tesekkurler. Hoscakal!"

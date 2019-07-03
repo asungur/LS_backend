@@ -1,4 +1,18 @@
-def prompt(message)
+LANGUAGE = 'en'
+
+require 'yaml'
+MESSAGES = YAML.load_file('calculator_messages.yml')
+
+def messages(message, lang='en')
+  MESSAGES[lang][message]
+end
+
+def prompt1(key)
+  message = messages(key, LANGUAGE)
+  Kernel.puts("=> #{message}")
+end
+
+def prompt2(message)
   Kernel.puts("=> #{message}")
 end
 
@@ -20,55 +34,47 @@ def operation_to_message(op)
   op
 end
 
-prompt("Welcome to Calculator Enter your name:")
+prompt1('welcome')
 
 name = ''
 loop do
   name = Kernel.gets().chomp()
 
   if name.empty?()
-    prompt("Make sure to use a valid name.")
+    prompt1('no_name')
   else
     break
   end
 end
 
-prompt("Hi #{name}")
+prompt2("Hi #{name}")
 
 loop do # main loop
   number1 = ''
   loop do
-    prompt("What's the first number?")
+    prompt1('ask_num_1')
     number1 = Kernel.gets().chomp()
 
     if valid_number?(number1)
       break
     else
-      prompt("The number is not valid!")
+      prompt1('invalid_num')
     end
   end
 
   number2 = ''
   loop do
-    prompt("What's the second number?")
+    prompt1('ask_num_2')
     number2 = Kernel.gets().chomp()
 
     if valid_number?(number2)
       break
     else
-      prompt("The number is not valid!")
+      prompt1('invalid_num')
     end
   end
 
-  operator_prompt = <<-MSG
-  What operation would you like to perform?
-  1) add
-  2) subtract
-  3) multiply
-  4) divide
-  MSG
-
-  prompt(operator_prompt)
+  prompt1('operator_prompt')
 
   operator = ''
   loop do
@@ -77,11 +83,19 @@ loop do # main loop
     if %w(1 2 3 4).include?(operator)
       break
     else
-      prompt("Must choose 1, 2, 3, 4")
+      prompt1('validate_op')
     end
   end
 
-  prompt("#{operation_to_message(operator)} the two numbers...")
+  operator_prompt= <<-MSG
+  What operation would you like to perform?
+  1) add
+  2) subtract
+  3) multiply
+  4) divide
+  MSG
+
+  prompt2("#{operation_to_message(operator)} the two numbers...")
 
   result =
     case operator
@@ -95,11 +109,11 @@ loop do # main loop
       number1.to_f() / number2.to_f()
     end
 
-  prompt("The result is #{result}")
+  prompt2("The result is #{result}")
 
-  prompt("Do you want to perform another calculation? (Y to calculate again)")
+  prompt1('reoperate')
   answer = Kernel.gets().chomp()
   break unless answer.downcase().start_with?('y')
 end
 
-prompt("Thank you for using the calculator. Good bye!")
+prompt1('exit_msg')
