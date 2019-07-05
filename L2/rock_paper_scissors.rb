@@ -34,6 +34,8 @@ loop do
 
   computer_choice = VALID_CHOICES.sample
 
+  prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
+
   display_result(choice, computer_choice)
 
   prompt("Do you want to play again?")
