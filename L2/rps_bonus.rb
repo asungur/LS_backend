@@ -56,7 +56,7 @@ def welcome(choices)
         )
 end
 
-def grand_win?(p_sc, c_sc)
+def display_grand_win(p_sc, c_sc)
   if p_sc >= WIN_SCORE
     prompt("You are the grand winner!")
   elsif c_sc >= WIN_SCORE
@@ -66,21 +66,53 @@ def grand_win?(p_sc, c_sc)
   end
 end
 
+def get_replay?
+  play_again = nil
+  loop do
+    prompt("Do you want to play again?")
+    answer = Kernel.gets().chomp().to_s.downcase
+    if %w(y yes ya ja).include?(answer)
+      play_again = true
+    else
+      play_again = false
+    end
+    break
+  end
+  return play_again
+end
+
+def retrieve_move_input(score_pl, score_cmp)
+  player_choice = ''
+  loop do
+    if score_pl == 0 && score_cmp == 0
+      prompt("Welcome to RPSSL game")
+      prompt("Win #{WIN_SCORE} rounds for the prize")
+    end
+    welcome(VALID_CHOICES.join(' '))
+    key = Kernel.gets().chomp().to_s.downcase
+    player_choice = convert_choice(key)
+    break if VALID_CHOICES.include?(player_choice)
+    prompt("That's not a valid choice")
+  end
+  return player_choice
+end
+
+def match_ended?(player_sc, computer_sc)
+  result = nil
+  if player_sc == WIN_SCORE || computer_sc == WIN_SCORE
+    result = true
+  else
+    result = false
+  end
+  return result
+end
+
 loop do
   loop do
     choice = ''
     key = ''
-    loop do
-      prompt("Welcome to RPSSL game") if player_score == 0 && comp_score == 0
-      welcome(VALID_CHOICES.join(' '))
-      key = Kernel.gets().chomp()
-      choice = convert_choice(key)
-      if VALID_CHOICES.include?(choice)
-        break
-      else
-        prompt("That's not a valid choice!")
-      end
-    end
+    choice = retrieve_move_input(player_score, comp_score)
+    system('clear') || system('cls')
 
     computer_choice = VALID_CHOICES.sample
 
@@ -93,17 +125,21 @@ loop do
 
     prompt("Score: You=#{player_score} | Computer=#{comp_score}")
 
-    grand_win?(player_score, comp_score)
+    display_grand_win(player_score, comp_score)
 
-    break if player_score == WIN_SCORE || comp_score == WIN_SCORE
+    break if match_ended?(player_score, comp_score)
   end
-
-  player_score = 0
-  comp_score = 0
-
-  prompt("Do you want to play again?")
-  answer = Kernel.gets().chomp()
-  break unless answer.downcase().start_with?('y')
+  final_result = get_replay?
+  if final_result
+    prompt("Restarting the game...")
+    system('clear') || system('cls')
+    player_score = 0
+    comp_score = 0
+  else
+    break
+  end
 end
+
+system('clear') || system('cls')
 
 prompt("Thank you for playing. Good bye!")
