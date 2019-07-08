@@ -70,13 +70,16 @@ def get_replay?
   play_again = nil
   loop do
     prompt("Do you want to play again?")
+    prompt("Y or Yes to continue; N or No to end")
     answer = Kernel.gets().chomp().to_s.downcase
-    if %w(y yes ya ja).include?(answer)
+    if %w(y yes).include?(answer)
       play_again = true
-    else
+    elsif %w(n no).include?(answer)
       play_again = false
+    else
+      prompt("Invalid input, please type a valid answer.")
     end
-    break
+    break if play_again == true || play_again == false
   end
   return play_again
 end
@@ -98,13 +101,7 @@ def retrieve_move_input(score_pl, score_cmp)
 end
 
 def match_ended?(player_sc, computer_sc)
-  result = nil
-  if player_sc == WIN_SCORE || computer_sc == WIN_SCORE
-    result = true
-  else
-    result = false
-  end
-  return result
+  player_sc == WIN_SCORE || computer_sc == WIN_SCORE
 end
 
 loop do
