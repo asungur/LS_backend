@@ -14,6 +14,5 @@ The Flintstones Rock!
 
 a = "The Flintstones Rock!"
 
-s = 
+10.times {|n| puts ' ' * n + a}
 
-10.times 
