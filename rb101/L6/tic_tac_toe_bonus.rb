@@ -19,18 +19,22 @@ WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # columns
                 [[1, 5, 9], [3, 5, 7]] # diagonals
 ROUNDS_TO_WIN = 5
+CHOOSE_MESSAGE = <<-MSG
+Select the first player:
+type p or player
+OR
+type c or computer
+MSG
 
+# rubocop:disable Metrics/CyclomaticComplexity
 def selective_move
   player = nil
   input = nil
+  valid_choices = %w(p player c computer)
   loop do
-    prompt "Select the first player:"
-    prompt "type p or player"
-    prompt "OR"
-    prompt "type c or computer"
+    puts CHOOSE_MESSAGE
     input = gets.chomp.to_s
-    break if input == 'p' || input == 'player'
-    break if input == 'c' || input == 'computer'
+    break if valid_choices.include?(input)
     prompt "Invalid choice"
   end
   player = "Computer" if input == 'c' || input == 'computer'
@@ -38,6 +42,7 @@ def selective_move
   return player if !!player
   nil
 end
+# rubocop:enable Metrics/CyclomaticComplexity
 
 def joinor(arr, sep = ', ', last = 'or')
   arr[-1] = last + ' ' + arr[-1].to_s
@@ -48,8 +53,8 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/AbcSize
-def display_board(brd,scr)
+# rubocop:disable Metrics/AbcSize, MethodLength, UnneededInterpolation
+def display_board(brd, scr)
   system 'clear'
   puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
@@ -65,9 +70,9 @@ def display_board(brd,scr)
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}  "
   puts "     |     |"
   puts ""
-  puts "#{scr.map{|k,v| "#{k}=#{v}"}.join(' & ')}"
+  puts "#{scr.map { |k, v| "#{k}=#{v}" }.join(' & ')}"
 end
-# rubocop:enable Metrics/AbcSize
+# rubocop:enable Metrics/AbcSize, MethodLength, UnneededInterpolation
 
 def initialize_board
   new_board = {}
@@ -79,7 +84,7 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
-def place_piece!(brd,initial_player)
+def place_piece!(brd, initial_player)
   if initial_player == 'Player'
     player_places_pieces!(brd)
   elsif initial_player == 'Computer'
@@ -105,34 +110,25 @@ end
 
 def find_at_risk(ln, brd, marker)
   if brd.values_at(*ln).count(marker) == 2
-    brd.select{ |k,v| ln.include?(k) && v == INITIAL_MARKER}.keys.first
-  else
-    nil
+    brd.select { |k, v| ln.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
-def computer_places_piece!(brd)
+def strategy(brd, marker)
   sqr = nil
   WINNING_LINES.each do |line|
-    sqr = find_at_risk(line, brd, COMPUTER_MARKER)
+    sqr = find_at_risk(line, brd, marker)
     break if sqr
   end
-  
-  if !sqr
-    WINNING_LINES.each do |line|
-      sqr = find_at_risk(line, brd, PLAYER_MARKER)
-      break if sqr
-    end
-  end
-  
-  if !sqr && brd[5] == INITIAL_MARKER
-    sqr = 5
-  end
+  sqr
+end
 
-  if !sqr
-    sqr = empty_squares(brd).sample
-  end
-  
+def computer_places_piece!(brd)
+  sqr = strategy(brd, COMPUTER_MARKER)
+  sqr = strategy(brd, PLAYER_MARKER) if !sqr
+  sqr = 5 if !sqr && brd[5] == INITIAL_MARKER
+  sqr = empty_squares(brd).sample if !sqr
+
   brd[sqr] = COMPUTER_MARKER
 end
 
@@ -156,7 +152,7 @@ def detect_winner(brd)
 end
 
 def detect_grand_winner(scr)
-  if scr.has_value?(ROUNDS_TO_WIN)
+  if scr.value?(ROUNDS_TO_WIN)
     return scr.key(ROUNDS_TO_WIN)
   end
   nil
@@ -176,13 +172,13 @@ end
 
 loop do
   round = 1
-  score = { "Player" => 0, "Computer" => 0}
+  score = { "Player" => 0, "Computer" => 0 }
   current_player = nil
   answer = nil
   loop do
     board = initialize_board
-    display_board(board,score)
-    
+    display_board(board, score)
+
     case FIRST_MOVE
     when 'choose' then current_player = selective_move
     when 'player' then current_player = 'Player'
@@ -190,25 +186,25 @@ loop do
     end
 
     loop do
-      display_board(board,score)
-      place_piece!(board,current_player)
+      display_board(board, score)
+      place_piece!(board, current_player)
       current_player = change_player(current_player)
       break if someone_won?(board) || board_full?(board)
     end
-    
-    display_board(board,score)
-    
+
+    display_board(board, score)
+
     round += 1
-    
+
     if someone_won?(board)
       score[detect_winner(board)] += 1
     else
       prompt "It's a tie!"
     end
-    
+
     break if someone_won_the_game?(score)
   end
-  
+
   prompt "#{detect_grand_winner(score)} won!"
   prompt "Play again? (y or n)"
   loop do
