@@ -1,17 +1,7 @@
-=begin
-1. Initialise deck
-2. Deal cards to player and dealer
-3. Player turn: hit or stay
-  -Repeat until bust or stay
-  -If both player and dealer stay go to #7
-4. If player bust, dealer wins
-5. Dealer turn: hit or stay (bot)
-6. If dealer bust, player wins. Else go back to #4
-7. Compare cards and declare winner
-=end
-
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 SUITS = ['H', 'D', 'S', 'C']
+# Name the game (twenty-one, fourty-one, etc.)
+WHATEVER = 21
 
 def prompt(message)
   puts "=> #{message}"
@@ -39,21 +29,20 @@ def total(cards)
   # correction for Aces
 
   values.select { |value| value == 'A' }.count.times do
-    sum -= 10 if sum > 21
+    sum -= 10 if sum > WHATEVER
   end
   sum
 end
 # rubocop:enable Style/ConditionalAssignment
 
 def busted?(cards_total)
-  cards_total > 21
+  cards_total > WHATEVER
 end
 
 def detect_result(dlr_total, plyr_total)
-
-  if plyr_total > 21
+  if plyr_total > WHATEVER
     :player_busted
-  elsif dlr_total > 21
+  elsif dlr_total > WHATEVER
     :dealer_busted
   elsif dlr_total < plyr_total
     :player
@@ -64,51 +53,46 @@ def detect_result(dlr_total, plyr_total)
   end
 end
 
-def display_result(dealer_cards,
-  player_cards,
-  dlr_total,
-  plyr_total,
-  plyr_score,
-  dlr_score)
-  
+def update_score(dlr_total, plyr_total, dlr_score, plyr_score)
+  result = detect_result(dlr_total, plyr_total)
+
+  case result
+  when :dealer
+    dlr_score += 1
+  when :player
+    plyr_score += 1
+  end
+  [dlr_score, plyr_score]
+end
+
+def display_result(dlr_total, plyr_total)
   result = detect_result(dlr_total, plyr_total)
 
   case result
   when :player_busted
     prompt "You busted! Dealer wins!"
-    dlr_score += 1
   when :dealer_busted
     prompt "Dealer busted! You win!"
-    plyr_score += 1
   when :player
     prompt "You win!"
-    plyr_score += 1
   when :dealer
     prompt "Dealer wins!"
-    dlr_score += 1
   when :tie
     prompt "It's a tie!"
   end
 end
 
 def compare_cards(dlr_cards,
-  plyr_cards,
-  dlr_total,
-  plyr_total,
-  plyr_score,
-  dlr_score)
-  
+                  plyr_cards,
+                  dlr_total,
+                  plyr_total)
+
   puts "=============="
   prompt "Dealer has #{dlr_cards}, for a total of: #{dlr_total}"
   prompt "Player has #{plyr_cards}, for a total of: #{plyr_total}"
   puts "=============="
-  
-  display_result(dlr_cards,
-  plyr_cards,
-  dlr_total,
-  plyr_total,
-  plyr_score,
-  dlr_score)
+
+  display_result(dlr_total, plyr_total)
 end
 
 def exit?
@@ -120,8 +104,8 @@ def exit?
       prompt "Please enter a valid answer"
       next
     else
-      res = true if valid_results[2,3].include?(answer)
-      res = false if valid_results[0,1].include?(answer)
+      res = true if valid_results[2, 3].include?(answer)
+      res = false if valid_results[0, 1].include?(answer)
       break
     end
   end
@@ -137,43 +121,53 @@ end
 def grand_winner?(plyr_score, dlr_score, rnd)
   winner = nil
   winner = "Player" if plyr_score >= 5
-  winner = "Dealer" if dlr_score
+  winner = "Dealer" if dlr_score >= 5
   puts "=============="
   prompt "Round #{rnd} is over!"
   prompt "Player:#{plyr_score} | Dealer:#{dlr_score}"
-  puts "#{winner} is the grand winner!" if winner != nil
+  puts "#{winner} is the grand winner!" if !winner.nil?
   puts "=============="
   winner
 end
 
+def welcome(rnd, plyr_score, dlr_score)
+  prompt "Welcome to #{WHATEVER}!" if rnd == 0
+  if rnd >= 1
+    prompt "Press any key to continue"
+    gets
+    system 'clear'
+    prompt "Player: #{plyr_score}, Dealer: #{dlr_score}"
+    prompt "Round: #{rnd + 1}.."
+  end
+end
+
 loop do
-  round = 1
+  round = 0
   player_score = 0
   dealer_score = 0
 
   loop do
-    prompt "Welcome to Twenty-One!" if round == 1
-    prompt "Round: #{round}.." if round > 1
+    welcome(round, player_score, dealer_score)
 
-  # Initialize variables
+    # Initialize variables
     deck = initialize_deck
     player_cards = []
     dealer_cards = []
 
-  # Initial deal
+    # Initial deal
     2.times do
       player_cards << deck.pop
       dealer_cards << deck.pop
     end
 
-  # End of distribution
+    # End of distribution
     player_total = total(player_cards)
     dealer_total = total(dealer_cards)
     prompt "Dealer has #{dealer_cards[0]} and ?"
     prompt "You have #{player_cards[0]} and #{player_cards[1]},
     for a total of #{player_total}"
 
-  # player turn
+    # player turn
     loop do
       player_turn = nil
       loop do
@@ -182,7 +176,7 @@ loop do
         break if ['h', 's'].include?(player_turn)
         prompt "Sorry, must enter 'h' or 's'."
       end
-  
+
       if player_turn == 'h'
         player_cards << deck.pop
         player_total = total(player_cards)
@@ -190,68 +184,74 @@ loop do
         prompt "Your cards are now: #{player_cards}"
         prompt "Your total is now: #{player_total}"
       end
-  
+
       break if player_turn == 's' || busted?(player_total)
     end
 
-  # Player busted check
+    # Player busted check
     if busted?(player_total)
 
       compare_cards(dealer_cards,
-      player_cards,
-      dealer_total,
-      player_total,
-      player_score,
-      dealer_score)
-      
-      grand_winner?(player_score, dealer_score, round) ? next : break
+                    player_cards,
+                    dealer_total,
+                    player_total)
+
+      dealer_score += 1
+
+      round += 1
+
+      grand_winner?(player_score, dealer_score, round) ? break : next
     else
       prompt "You stayed at #{player_total}"
     end
 
-  # dealer turn
+    # dealer turn
     prompt "Dealer turn..."
 
-  # Dealer hit loop
+    # Dealer hit loop
     loop do
-      break if dealer_total >= 17
-  
+      break if dealer_total >= WHATEVER - 4
+
       prompt "Dealer hits!"
       dealer_cards << deck.pop
       dealer_total = total(dealer_cards)
-      prompt "Dealer's cards are now: #{dealer_cards}"
+      # prompt "Dealer's cards are now: #{dealer_cards}"
     end
 
-  # Dealer busted check
+    # Dealer busted check
     if busted?(dealer_total)
 
       compare_cards(dealer_cards,
-      player_cards,
-      dealer_total,
-      player_total,
-      player_score,
-      dealer_score)
-      
-      grand_winner?(player_score, dealer_score, round) ? next : break
-      
+                    player_cards,
+                    dealer_total,
+                    player_total)
+
+      player_score += 1
+
+      round += 1
+
+      grand_winner?(player_score, dealer_score, round) ? break : next
+
     else
       prompt "Dealer stays at #{dealer_total}"
     end
 
     compare_cards(dealer_cards,
-      player_cards,
-      dealer_total,
-      player_total,
-      player_score,
-      dealer_score)
+                  player_cards,
+                  dealer_total,
+                  player_total)
 
-  round += 1
-  break unless grand_winner?(player_score, dealer_score, round)
-end
+    dealer_score, player_score = update_score(dealer_total,
+                                              player_total,
+                                              dealer_score,
+                                              player_score)
 
+    round += 1
+
+    break if grand_winner?(player_score, dealer_score, round)
+  end
 
   break unless play_again?
 end
-
 
 prompt "Thank you for playing Twenty-One! Good bye!"
