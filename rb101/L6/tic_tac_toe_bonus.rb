@@ -1,3 +1,4 @@
+# FIRST_MOVE can be 'choose', 'player' or 'computer'
 FIRST_MOVE = 'player'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
@@ -13,8 +14,7 @@ OR
 type c or computer
 MSG
 
-# rubocop:disable Metrics/CyclomaticComplexity
-def selective_move
+def user_defined_move
   player = nil
   input = nil
   valid_choices = %w(p player c computer)
@@ -24,12 +24,10 @@ def selective_move
     break if valid_choices.include?(input)
     prompt "Invalid choice"
   end
-  player = "Computer" if input == 'c' || input == 'computer'
-  player = "Player" if input == 'p' || input == 'player'
-  return player if !!player
-  nil
+  player = "Computer" if valid_choices[2, 3].include?(input)
+  player = "Player" if valid_choices[0, 1].include?(input)
+  player
 end
-# rubocop:enable Metrics/CyclomaticComplexity
 
 def joinor(arr, sep = ', ', last = 'or')
   arr[-1] = last + ' ' + arr[-1].to_s
@@ -40,9 +38,8 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/AbcSize, MethodLength, UnneededInterpolation
+# rubocop:disable Metrics/AbcSize, UnneededInterpolation
 def display_board(brd, scr)
-  system 'clear'
   puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}"
   puts ""
   puts "     |     |"
@@ -57,9 +54,9 @@ def display_board(brd, scr)
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}  "
   puts "     |     |"
   puts ""
-  puts "#{scr.map { |k, v| "#{k}=#{v}" }.join(' & ')}"
+  puts "#{scr.map { |k, v| "#{k}: #{v}" }.join(' & ')}"
 end
-# rubocop:enable Metrics/AbcSize, MethodLength, UnneededInterpolation
+# rubocop:enable Metrics/AbcSize, UnneededInterpolation
 
 def initialize_board
   new_board = {}
@@ -145,37 +142,49 @@ def detect_grand_winner(scr)
   nil
 end
 
-def someone_won_the_game?(scr)
-  !!detect_grand_winner(scr)
+def determine_current_player(first_mover)
+  player = ''
+  case first_mover
+  when 'choose' then player = user_defined_move
+  when 'player' then player = 'Player'
+  when 'computer' then player = 'Computer'
+  end
+  player
 end
 
-def valid_exit?(ans)
-  ans == 'n' || ans == 'no'
-end
-
-def valid_replay?(ans)
-  ans == 'y' || ans == 'yes'
+def play_again?
+  prompt "Play again? (y or n)"
+  answer = ''
+  valid_choice = ['no', 'n', 'yes', 'y']
+  loop do
+    answer = gets.chomp.to_s.downcase
+    break if valid_choice.include?(answer)
+    prompt "Invalid answer.."
+  end
+  system 'clear'
+  valid_choice[2, 3].include?(answer)
 end
 
 loop do
   round = 1
   score = { "Player" => 0, "Computer" => 0 }
   current_player = nil
-  answer = nil
+  grand_winner = nil
   loop do
     board = initialize_board
-    display_board(board, score)
+    prompt "Welcome to Tic Tac Toe game" if round == 1
+    puts "===========================" if round > 1
+    prompt "Score 5 first to win.."
+    prompt "Round: #{round}.." if round > 1
 
-    case FIRST_MOVE
-    when 'choose' then current_player = selective_move
-    when 'player' then current_player = 'Player'
-    when 'computer' then current_player = 'Computer'
-    end
+    current_player = determine_current_player(FIRST_MOVE)
 
     loop do
       display_board(board, score)
       place_piece!(board, current_player)
       current_player = change_player(current_player)
+      system 'clear'
+      puts "#{detect_winner(board)} won" if someone_won?(board)
       break if someone_won?(board) || board_full?(board)
     end
 
@@ -189,17 +198,18 @@ loop do
       prompt "It's a tie!"
     end
 
-    break if someone_won_the_game?(score)
+    grand_winner = detect_grand_winner(score)
+    if grand_winner
+      system 'clear'
+      display_board(board, score)
+    end
+    break if grand_winner
   end
 
-  prompt "#{detect_grand_winner(score)} won!"
-  prompt "Play again? (y or n)"
-  loop do
-    answer = gets.chomp
-    break if valid_exit?(answer) || valid_replay?(answer)
-    prompt "Invalid answer.."
-  end
-  break if valid_exit?(answer)
+  prompt "#{grand_winner} won the game!"
+  break unless play_again?
 end
+
+system 'clear'
 
 prompt "Thank's for playing Tic Tac Toe! Good bye.."
