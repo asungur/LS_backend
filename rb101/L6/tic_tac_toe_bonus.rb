@@ -143,13 +143,11 @@ def detect_grand_winner(scr)
 end
 
 def determine_current_player(first_mover)
-  player = ''
   case first_mover
-  when 'choose' then player = user_defined_move
-  when 'player' then player = 'Player'
-  when 'computer' then player = 'Computer'
+  when 'choose' then user_defined_move
+  when 'player' then 'Player'
+  when 'computer' then 'Computer'
   end
-  player
 end
 
 def play_again?
@@ -171,9 +169,9 @@ loop do
   current_player = nil
   grand_winner = nil
   loop do
+    system 'clear'
     board = initialize_board
     prompt "Welcome to Tic Tac Toe game" if round == 1
-    puts "===========================" if round > 1
     prompt "Score 5 first to win.."
     prompt "Round: #{round}.." if round > 1
 
@@ -183,12 +181,15 @@ loop do
       display_board(board, score)
       place_piece!(board, current_player)
       current_player = change_player(current_player)
-      system 'clear'
+      system 'clear' if someone_won?(board)
+      display_board(board, score) if someone_won?(board)
       puts "#{detect_winner(board)} won" if someone_won?(board)
+      sleep(2.5) if someone_won?(board) || board_full?(board)
+      system 'clear'
       break if someone_won?(board) || board_full?(board)
     end
+    #system 'clear'
 
-    display_board(board, score)
 
     round += 1
 
