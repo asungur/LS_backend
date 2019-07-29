@@ -1,7 +1,8 @@
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 SUITS = ['H', 'D', 'S', 'C']
 # Name the game (twenty-one, fourty-one, etc.)
-WHATEVER = 21
+BLACKJACK = 21
+VALID_EXIT_ANSWERS = %w(n no y yes)
 
 def prompt(message)
   puts "=> #{message}"
@@ -29,20 +30,20 @@ def total(cards)
   # correction for Aces
 
   values.select { |value| value == 'A' }.count.times do
-    sum -= 10 if sum > WHATEVER
+    sum -= 10 if sum > BLACKJACK
   end
   sum
 end
 # rubocop:enable Style/ConditionalAssignment
 
 def busted?(cards_total)
-  cards_total > WHATEVER
+  cards_total > BLACKJACK
 end
 
 def detect_result(dlr_total, plyr_total)
-  if plyr_total > WHATEVER
+  if plyr_total > BLACKJACK
     :player_busted
-  elsif dlr_total > WHATEVER
+  elsif dlr_total > BLACKJACK
     :dealer_busted
   elsif dlr_total < plyr_total
     :player
@@ -82,59 +83,70 @@ def display_result(dlr_total, plyr_total)
   end
 end
 
+def display_cards(cards, single = true)
+  display = ''
+  if single
+    display = cards[1] + cards[0].downcase
+  else
+    cards.each do |card|
+      display += (' ' + card[1] + card[0].downcase)
+    end
+  end
+  display
+end
+
 def compare_cards(dlr_cards,
                   plyr_cards,
                   dlr_total,
                   plyr_total)
 
   puts "=============="
-  prompt "Dealer has #{dlr_cards}, for a total of: #{dlr_total}"
-  prompt "Player has #{plyr_cards}, for a total of: #{plyr_total}"
+  prompt "Dealer has #{display_cards(dlr_cards, false)}, for a total of: #{dlr_total}"
+  prompt "Player has #{display_cards(plyr_cards, false)}, for a total of: #{plyr_total}"
   puts "=============="
 
   display_result(dlr_total, plyr_total)
 end
 
-def exit?
-  res = nil
-  valid_results = %w(n no y yes)
+def retrieve_exit_answer
+  answer = ''
+  puts "--------------"
+  prompt "Do you want to play again? (y or n)"
   loop do
     answer = gets.chomp.downcase.to_s
-    if !valid_results.include?(answer)
-      prompt "Please enter a valid answer"
-      next
-    else
-      res = true if valid_results[2, 3].include?(answer)
-      res = false if valid_results[0, 1].include?(answer)
-      break
-    end
+    break if VALID_EXIT_ANSWERS.include?(answer)
+    prompt "Please enter a valid answer"
   end
-  res
+  answer
 end
 
-def play_again?
-  puts "---------------"
-  prompt "Do you want to play again? (y or n)"
-  exit?
+def play_again?(answer)
+  VALID_EXIT_ANSWERS[2, 3].include?(answer)
 end
 
 def grand_winner?(plyr_score, dlr_score, rnd)
   winner = nil
   winner = "Player" if plyr_score >= 5
   winner = "Dealer" if dlr_score >= 5
+  winner
+end
+
+def display_end_round(plyr_score, dlr_score, winner, rnd)
   puts "=============="
   prompt "Round #{rnd} is over!"
   prompt "Player:#{plyr_score} | Dealer:#{dlr_score}"
   puts "#{winner} is the grand winner!" if !winner.nil?
   puts "=============="
-  winner
 end
 
 def welcome(rnd, plyr_score, dlr_score)
-  prompt "Welcome to #{WHATEVER}!" if rnd == 0
-  if rnd >= 1
-    prompt "Press any key to continue"
-    gets
+  if rnd == 0
+    system 'clear'
+    prompt "Welcome to #{BLACKJACK}!"
+    prompt "Win 5 rounds before the dealer to win the game"
+  elsif rnd >= 1
+    prompt "New round starts in 5..."
+    sleep(5)
     system 'clear'
     prompt "Player: #{plyr_score}, Dealer: #{dlr_score}"
     prompt "Round: #{rnd + 1}.."
@@ -145,7 +157,7 @@ loop do
   round = 0
   player_score = 0
   dealer_score = 0
-
+  winner = nil
   loop do
     welcome(round, player_score, dealer_score)
 
@@ -163,13 +175,13 @@ loop do
     # End of distribution
     player_total = total(player_cards)
     dealer_total = total(dealer_cards)
-    prompt "Dealer has #{dealer_cards[0]} and ?"
-    prompt "You have #{player_cards[0]} and #{player_cards[1]},
-    for a total of #{player_total}"
+    prompt "Dealer has #{display_cards(dealer_cards[0])} and ?"
+    prompt "You have #{display_cards(player_cards[0])} and #{display_cards(player_cards[1])}, for a total of #{player_total}"
 
     # player turn
     loop do
       player_turn = nil
+      break if player_total == BLACKJACK || dealer_total == BLACKJACK
       loop do
         prompt "Would you like to (h)it or (s)tay?"
         player_turn = gets.chomp.downcase
@@ -181,7 +193,7 @@ loop do
         player_cards << deck.pop
         player_total = total(player_cards)
         prompt "You chose to hit!"
-        prompt "Your cards are now: #{player_cards}"
+        prompt "Your cards are now: #{display_cards(player_cards, false)}"
         prompt "Your total is now: #{player_total}"
       end
 
@@ -197,7 +209,6 @@ loop do
                     player_total)
 
       dealer_score += 1
-
       round += 1
 
       grand_winner?(player_score, dealer_score, round) ? break : next
@@ -210,12 +221,15 @@ loop do
 
     # Dealer hit loop
     loop do
-      break if dealer_total >= WHATEVER - 4
+      # Dealer stops hitting if it reaches BLACKJACK - 4
+      break if dealer_total >= BLACKJACK - 4
+      # Break dealer loop if player or dealer already reached BLACKJACK
+      break if player_total == BLACKJACK || dealer_total == BLACKJACK
 
       prompt "Dealer hits!"
       dealer_cards << deck.pop
       dealer_total = total(dealer_cards)
-      # prompt "Dealer's cards are now: #{dealer_cards}"
+      sleep(1.5)
     end
 
     # Dealer busted check
@@ -231,7 +245,7 @@ loop do
       round += 1
 
       grand_winner?(player_score, dealer_score, round) ? break : next
-
+      sleep(1.5)
     else
       prompt "Dealer stays at #{dealer_total}"
     end
@@ -247,11 +261,12 @@ loop do
                                               player_score)
 
     round += 1
-
-    break if grand_winner?(player_score, dealer_score, round)
+    sleep(1.5)
+    winner = grand_winner?(player_score, dealer_score, round)
+    break if winner
   end
-
-  break unless play_again?
+  display_end_round(player_score, dealer_score, winner, round)
+  break unless play_again?(retrieve_exit_answer)
 end
 
 prompt "Thank you for playing Twenty-One! Good bye!"
