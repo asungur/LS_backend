@@ -3,6 +3,7 @@ SUITS = ['H', 'D', 'S', 'C']
 # Name the game (twenty-one, fourty-one, etc.)
 BLACKJACK = 21
 VALID_EXIT_ANSWERS = %w(n no y yes)
+ROUNDS_TO_WIN = 5
 
 def prompt(message)
   puts "=> #{message}"
@@ -124,7 +125,7 @@ def play_again?(answer)
   VALID_EXIT_ANSWERS[2, 3].include?(answer)
 end
 
-def grand_winner?(plyr_score, dlr_score, rnd)
+def grand_winner(plyr_score, dlr_score)
   winner = nil
   winner = "Player" if plyr_score >= 5
   winner = "Dealer" if dlr_score >= 5
@@ -143,7 +144,7 @@ def welcome(rnd, plyr_score, dlr_score)
   if rnd == 0
     system 'clear'
     prompt "Welcome to #{BLACKJACK}!"
-    prompt "Win 5 rounds before the dealer to win the game"
+    prompt "Win #{ROUNDS_TO_WIN} rounds before the dealer to win the game"
   elsif rnd >= 1
     prompt "New round starts in 5..."
     sleep(5)
@@ -211,7 +212,7 @@ loop do
       dealer_score += 1
       round += 1
 
-      grand_winner?(player_score, dealer_score, round) ? break : next
+      grand_winner(player_score, dealer_score) ? break : next
     else
       prompt "You stayed at #{player_total}"
     end
@@ -244,7 +245,7 @@ loop do
 
       round += 1
 
-      grand_winner?(player_score, dealer_score, round) ? break : next
+      grand_winner(player_score, dealer_score) ? break : next
       sleep(1.5)
     else
       prompt "Dealer stays at #{dealer_total}"
@@ -262,7 +263,7 @@ loop do
 
     round += 1
     sleep(1.5)
-    winner = grand_winner?(player_score, dealer_score, round)
+    winner = grand_winner(player_score, dealer_score)
     break if winner
   end
   display_end_round(player_score, dealer_score, winner, round)
