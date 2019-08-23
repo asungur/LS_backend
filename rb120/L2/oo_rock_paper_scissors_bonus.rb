@@ -35,10 +35,21 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
-
+  attr_accessor :move, :score
+  attr_reader :name
+  
   def initialize
     set_name
+    @score = 0
+  end
+  
+  # SCORE RELATED METHODS
+  def update_score
+    self.score += 1
+  end
+  
+  def reset_score
+    self.score = 0
   end
 end
 
@@ -80,9 +91,10 @@ end
 class RPSGame
   attr_accessor :human, :computer
 
-  def initialize
+  def initialize(to_win)
     @human = Human.new
     @computer = Computer.new
+    @target_rounds = to_win
   end
 
   def display_welcome_message
@@ -97,14 +109,57 @@ class RPSGame
     puts "#{human.name} chose #{human.move}."
     puts "#{computer.name} chose #{computer.move}."
   end
+  
+  def select_winner
+    if human.move > computer.move
+      'player'
+    elsif human.move < computer.move
+      'computer'
+    else
+      'tie'
+    end
+  end
 
   def display_winner
-    if human.move > computer.move
+    winner = select_winner
+    case winner
+    when 'player'
       puts "#{human.name} won!"
-    elsif human.move < computer.move
+    when 'computer'
       puts "#{computer.name} won!"
-    else
+    when 'tie'
       puts "It's a tie"
+    end
+  end
+  
+  def modify_score(winner)
+    case winner
+    when 'player'
+      human.update_score
+    when 'computer'
+      computer.update_score
+    end
+  end
+  
+  def show_score
+    puts "Current score is:"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
+    puts ""
+  end
+  
+  def grand_winner?
+    human.score == @target_rounds || computer.score == @target_rounds
+  end
+  
+  def grand_winner
+    if human.score == @target_rounds
+      return human.name
+    elsif computer.score == @target_rounds
+      return computer.name
+    else
+      #GUARD LINE
+      puts "ERROR:Leak in grand_winner condition!"
     end
   end
 
@@ -120,17 +175,36 @@ class RPSGame
     return true if answer.downcase == 'y'
   end
 
-  def play
-    display_welcome_message
-
+  def game_loop
     loop do
       human.choose
       computer.choose
-      display_moves
+      select_winner
       display_winner
+      update_score
+      show_score
+      break if grand_winner?
+    end
+  end
+  
+  def display_grand_winner
+    champion = grand_winner
+    puts ""
+    puts "The grand winner is: #{champion.capitalize}"
+    puts ""
+  end
+
+  def play
+    display_welcome_message
+    loop do
+      game_loop
+      display_grand_winner
       break unless play_again?
     end
     display_goodbye_message
   end
+  
+
+  
 end
-RPSGame.new.play
+RPSGame.new.play(6)
