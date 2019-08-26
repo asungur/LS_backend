@@ -1,3 +1,10 @@
+## Version history:
+
+v1_improvements.rb - Improved version from the discussion chapter
+
+v0_assignment.rb - First walkthrough version
+
+
 ## Steps of thinking:
 
 1. Write a description of the problem and extract major nouns and verbs.
