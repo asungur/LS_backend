@@ -1,4 +1,4 @@
-Steps of thinking:
+## Steps of thinking:
 
 1. Write a description of the problem and extract major nouns and verbs.
 2. Make an initial guess at organizing the verbs into nouns and do a spike to explore the problem with temporary code.
