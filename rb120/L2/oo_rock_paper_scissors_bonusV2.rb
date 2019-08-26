@@ -1,9 +1,17 @@
 class Move
-  VALUES = { rock: %w(r rock),
-             paper: %w(p paper),
-             scissors: %w(s scissors),
-             lizard: %w(l lizard),
-             spock: %w(sp spock) }.freeze
+  VALUES = { 'rock' => %w(r rock),
+             'paper' => %w(p paper),
+             'scissors' => %w(s scissors),
+             'lizard' => %w(l lizard),
+             'spock' => %w(sp spock) }.freeze
+
+  WINNING_MOVES = {
+    'rock' => ['lizard', 'scissors'],
+    'paper' => ['rock', 'spock'],
+    'scissors' => ['paper', 'lizard'],
+    'lizard' => ['paper', 'spock'],
+    'spock' => ['rock', 'scissors']
+  }
 
   def initialize(val)
     @value = val.to_s.downcase
@@ -48,35 +56,23 @@ class Move
   def lose_to_spock?
     rock? || scissors?
   end
-
-  def win_to_rock?
-    spock? || paper?
+  
+  def value
+    @value
   end
-
-  def win_to_paper?
-    lizard? || scissors?
-  end
-
-  def win_to_scissors?
-    rock? || spock?
-  end
-
-  def win_to_lizard?
-    rock? || scissors?
-  end
-
-  def win_to_spock?
-    paper? || lizard?
+  
+  def >(other_move)
+    WINNING_MOVES[self.value].include?(other_move.value)
   end
 
   # rubocop:disable Metrics/PerceivedComplexity , Metrics/CyclomaticComplexity
-  def >(other_move)
-    (rock? && other_move.lose_to_rock?) ||
-      (paper? && other_move.lose_to_paper?) ||
-      (scissors? && other_move.lose_to_scissors?) ||
-      (lizard? && other_move.lose_to_lizard?) ||
-      (spock? && other_move.lose_to_spock?)
-  end
+  # def >(other_move)
+  #   (rock? && other_move.lose_to_rock?) ||
+  #     (paper? && other_move.lose_to_paper?) ||
+  #     (scissors? && other_move.lose_to_scissors?) ||
+  #     (lizard? && other_move.lose_to_lizard?) ||
+  #     (spock? && other_move.lose_to_spock?)
+  # end
   # rubocop:enable Metrics/PerceivedComplexity , Metrics/CyclomaticComplexity
 
   def to_s
@@ -143,11 +139,10 @@ end
 
 class Computer < Player
   attr_accessor :bhvr
-  # COMPUTER BEHAVIOUR
   # Behaviour 1 AKA Counter =>
-  #   Find the most common choice in history
-  #   Find two counterpicks to most common choice
-  #   %66 percent counter pick to most common player choice
+  #   Finds the most common choice in history
+  #   Finds two counterpicks of the most common choice
+  #   %66 percent counter picks the most common choice
 
   # Behaviour 2 AKA Random => Randomly
 
@@ -184,7 +179,6 @@ class Computer < Player
   end
 
   def behaviour_1(history)
-    # Creates an array from two counter moves + n number of random moves
     counter_move(history).sample
   end
 
@@ -216,7 +210,27 @@ class Computer < Player
 end
 
 class RPSGame
-  attr_accessor :human, :computer, :human_hist, :computer_hist
+  attr_reader :human, :computer
+  
+  def play
+    display_welcome_message
+    loop do
+      game_loop
+      display_grand_winner
+      # OPTIONAL TEST LINE BELOW
+      # display_history(human)
+      break unless play_again?
+      reset_score
+      reset_hist
+      new_screen(:game)
+    end
+    display_goodbye_message
+  end
+
+  private
+  attr_accessor :human_hist, :computer_hist, :target_rounds
+  attr_writer :human, :computer
+  
   def initialize(to_win)
     @human = Human.new
     @computer = Computer.new
@@ -233,6 +247,8 @@ class RPSGame
 
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors, Lizard and Spock!"
+    puts "#{human.name} VS. #{computer.name}"
+    puts "Win #{target_rounds} rounds for the grand winner title!"
     puts ""
   end
 
@@ -340,7 +356,7 @@ class RPSGame
     loop do
       human.choose
       modify_history(human)
-      computer.choose(self.human_hist)
+      computer.choose(human_hist)
       modify_history(computer)
       display_moves
       display_winner
@@ -357,21 +373,6 @@ class RPSGame
     puts ""
     puts "The grand winner is: #{champion.capitalize}"
     puts ""
-  end
-
-  def play
-    display_welcome_message
-    loop do
-      game_loop
-      display_grand_winner
-      # OPTIONAL TEST LINE BELOW
-      # display_history(human)
-      break unless play_again?
-      reset_score
-      reset_hist
-      new_screen(:game)
-    end
-    display_goodbye_message
   end
 end
 
