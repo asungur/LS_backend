@@ -9,7 +9,6 @@ class Board
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                   [[1, 5, 9], [3, 5, 7]].freeze
 
-
   def initialize
     @squares = {}
     reset
@@ -100,10 +99,14 @@ end
 class Player
   attr_reader :marker, :name, :score
 
-  def initialize(marker, player_type = :human)
+  def initialize(player_type = :human)
     @player_type = player_type
     @name = set_name if human?
-    human? ? @marker = set_marker : @marker = TTTGame::COMPUTER_MARKER
+    @marker = if human?
+                set_marker
+              else
+                TTTGame::COMPUTER_MARKER
+              end
     @score = 0
   end
 
@@ -125,7 +128,7 @@ class Player
   def update_score
     @score += 1
   end
-  
+
   def reset_score
     @score = 0
   end
@@ -148,7 +151,7 @@ class Player
     loop do
       puts "Please enter your name:"
       input = gets.chomp.to_s
-      name = input.gsub(/[^0-9a-z-]/i, '' )
+      name = input.gsub(/[^0-9a-z-]/i, '')
       break unless name.empty?
       puts "Sorry, must enter a value"
     end
@@ -184,7 +187,7 @@ class TTTGame
   attr_accessor :score_to_win
 
   include ClearScreen
-  
+
   def game_loop
     loop do
       display_score_new_round
@@ -236,9 +239,9 @@ class TTTGame
 
   def initialize(score = 5)
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER, :computer)
-    FIRST_TO_MOVE == 'human' ? @current_marker = human.marker : @current_marker = computer.marker
+    @human = Player.new
+    @computer = Player.new(:computer)
+    reset_marker
     @score_to_win = score
   end
 
@@ -300,7 +303,7 @@ class TTTGame
   end
 
   def display_new_game_message
-    puts "Starting a new game:"
+    puts "Started a new game:"
     puts ""
   end
 
@@ -309,10 +312,18 @@ class TTTGame
     human.reset_score
     computer.reset_score
   end
-  
+
+  def reset_marker
+    @current_marker = if FIRST_TO_MOVE == 'human'
+                        human.marker
+                      else
+                        computer.marker
+                      end
+  end
+
   def reset_round
     board.reset
-    FIRST_TO_MOVE == 'human' ? @current_marker = human.marker : @current_marker = computer.marker
+    reset_marker
     screen_clear
   end
 end
