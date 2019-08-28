@@ -106,3 +106,72 @@ class TTTGame
   end
 end
 ```
+
+### **Custom board size:** (implemented in v2)
+
+Assuming board `size(n x n) = 4` (4 x 4 grid)
+for `n = 4` (algorithm written in isolation and for explanation only)
+
+1. Winning lines could be appended as follows:
+
+```ruby
+winning_lines = []
+(1..(n**2)).each do |i|
+  if i > n && i < n*(n-1) && i%n != 0 && i%n !=1
+    winning_lines << [(i-n-1), i, (i+n+1)]# diagonal \
+    winning_lines << [(i-n+1), i, (i+n-1)]# diagonal /
+    winning_lines << [(i-n), i, (i+n)]# column |
+    winning_lines << [(i-1), i, (i+1)]# row -
+  end
+end
+```
+`winning_lines` will return `[[1, 5, 9], [3, 5, 7], [2, 5, 8], [4, 5, 6]]`
+
+2. Board can be drawn as follows:
+
+Constant string elements:
+
+```ruby
+EMPTY_ROW_LEFT = ("     ")
+EMPTY_ROW_RIGHT = ("|      ")
+EMPTY_ROW_MID = ("|     ")
+RULE_ROW_LEFT = ("-----")
+RULE_ROW_RIGHT = ("|-----")
+```
+
+Between the constants squares(cells) with values will be printed. Below code returns index values:
+
+```ruby
+(1..n).each do |i|
+  puts EMPTY_ROW_LEFT + EMPTY_ROW_MID*(n-2) + EMPTY_ROW_RIGHT
+  value_row = ''
+  (1..n).each do |t|
+    square_number = ((i-1)*n)+t
+    if t == 1
+      value_row << "  #{square_number}  "
+    else t == n
+      value_row << "|  #{square_number}  "
+    end
+  end
+  puts value_row
+  puts EMPTY_ROW_LEFT + EMPTY_ROW_MID*(n-2) + EMPTY_ROW_RIGHT
+  puts RULE_ROW_LEFT + RULE_ROW_RIGHT*(n-2) + RULE_ROW_RIGHT if i != n
+end
+```
+Above code will output:
+
+```
+     |     |      
+  1  |  2  |  3  
+     |     |      
+-----|-----|-----
+     |     |      
+  4  |  5  |  6  
+     |     |      
+-----|-----|-----
+     |     |      
+  7  |  8  |  9  
+     |     |      
+```
+
+
