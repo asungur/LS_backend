@@ -106,3 +106,33 @@ class TTTGame
   end
 end
 ```
+
+### **Custom board size:** (implemented in v2)
+
+Algorithmic implemented in ruby:
+
+```ruby
+empty_left = "     "
+empty_right = "|      "
+empty_mid = "|     "
+rule_left = "-----"
+rule_right = "|-----"
+rule_mid = "|-----"
+
+n = 5
+(1..n).each do |i|
+  puts empty_left + empty_mid*(n-2) + empty_right
+  value_row = ''
+  (1..n).each do |t|
+    square_number = ((i-1)*n)+t
+    if t == 1
+      value_row << "  #{square_number}  "
+    else t == n
+      value_row << "|  #{square_number}  "
+    end
+  end
+  puts value_row
+  puts empty_left + empty_mid*(n-2) + empty_right
+  puts rule_left + rule_mid*(n-2) + rule_right if i != n
+end
+```
