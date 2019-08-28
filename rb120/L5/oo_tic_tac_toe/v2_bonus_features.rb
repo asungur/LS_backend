@@ -5,57 +5,20 @@ module ClearScreen
 end
 
 class Board
-  attr_reader :winning_lines
-  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
-                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
-                  [[1, 5, 9], [3, 5, 7]].freeze
-
-  EMPTY_CELLS = {
-  'corner' => %Q(
-     
-  i  
-     
-    ),
-  'top/bottom' => %Q(
-|     |
-|  i  |
-|     |
-    ),
-  'side' => %Q(
------
-  i  
------
-    ),
-  'centre' => %Q(
-|-----|
-|     |
-|  i  |
-|     |
-|-----|
-    )
-}
+  attr_reader :board_size, :winning_lines
+  # WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
+  #                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
+  #                 [[1, 5, 9], [3, 5, 7]].freeze
 
   def initialize
     @squares = {}
+    set_board_size
     reset
+    set_winning_line
   end
 
   def []=(num, marker)
     @squares[num].marker = marker
-  end
-
-  def set_winning_lines(n)
-    winning_lines = []
-    # in n x n grid
-    (1..(n*n)) do |idx|
-      if (idx%n != 1) || (idx%n != 0) || (i<(n*(n-1))) || (i>n)
-        winning_lines << [(i-n-1), i, (i+n+1)] # diagonal \
-        winning_lines << [(i-n), i, (i+n)] # diagonal /
-        winning_lines << [(i-n), i, (i+n)] # column
-        winning_lines << [(i-1), i, (i+1)] # row
-      end
-    end
-    @winning_lines = remove_duplicates(winning_lines)
   end
 
   def unmarked_keys
@@ -79,7 +42,7 @@ class Board
   end
 
   def winning_marker
-    WINNING_LINES.each do |line|
+    winning_lines.each do |line|
       squares = @squares.values_at(*line)
       if three_identical_markers?(squares)
         return squares.first.marker
@@ -95,33 +58,98 @@ class Board
   end
 
   def reset
-    (1..9).each { |num| @squares[num] = Square.new() }
+    (1..(board_size**2)).each { |num| @squares[num] = Square.new }
   end
 
   # rubocop:disable Metrics/AbcSize
   def draw
-    puts "     |     |"
-    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}  "
-    puts "     |     |"
-    puts "-----|-----|-----"
-    puts "     |     |"
-    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}  "
-    puts "     |     |"
-    puts "-----|-----|-----"
-    puts "     |     |"
-    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}  "
-    puts "     |     |"
+    (1..board_size).each do |i|
+      puts EMPTY_ROW_LEFT + EMPTY_ROW_MID * (board_size - 2) + EMPTY_ROW_RIGHT
+      row_with_value = ''
+      (1..board_size).each do |t|
+        square_index = ((i - 1) * board_size) + t
+        row_with_value << if t == 1
+                            "  #{@squares[square_index]}  "
+                          else
+                            "|  #{@squares[square_index]}  "
+                          end
+      end
+      puts row_with_value
+      puts EMPTY_ROW_LEFT + EMPTY_ROW_MID * (board_size - 2) + EMPTY_ROW_RIGHT
+      puts RULE_ROW_LEFT + RULE_ROW_RIGHT * (board_size - 1) if i != board_size
+    end
   end
   # rubocop:enable Metrics/AbcSize
 
   private
 
-  def remove_duplicates(arr)
-    arr_return = []
-    arr.each do |sub_arr|
-      arr_return << sub_arr.sort unless arr_return.include? sub_arr.sort
+  def corner_cell?(index)
+    size = board_size
+    [1, size, size**2, (size * (size - 1) + 1)].include?(index)
+  end
+
+  def first_last_row?(index)
+    size = board_size
+    (index % size != 0 || index % size != 1)
+  end
+
+  def first_last_col?(index)
+    n = board_size
+    (2...n).cover?(index) || ((n * (n - 1) + 2)...(n**2)).cover?(index)
+  end
+
+  def row_cells(index)
+    [(index - 1), index, (index + 1)]
+  end
+
+  def column_cells(index)
+    [(index - board_size), index, (index + board_size)]
+  end
+
+  def diagonal_cells_back(index) # diagonal \
+    [(index - board_size - 1), index, (index + board_size + 1)]
+  end
+
+  def diagonal_cells_forward(index) # diagonal /
+    [(index - board_size + 1), index, (index + board_size - 1)]
+  end
+
+  # rubocop:disable Metrics/AbcSize
+  def set_winning_line
+    winning_lines = []
+    n = board_size
+    (1..(n**2)).each do |i|
+      if first_last_col?(i)
+        winning_lines << row_cells(i)
+      elsif first_last_row?(i) && !corner_cell?(i)
+        winning_lines << column_cells(i)
+      elsif !corner_cell?(i)
+        winning_lines << diagonal_cells_back(i)
+        winning_lines << diagonal_cells_forward(i)
+        winning_lines << column_cells(i)
+        winning_lines << row_cells(i)
+      end
     end
-    arr_return
+    @winning_lines = winning_lines
+  end
+  # rubocop:enable Metrics/AbcSize
+
+  EMPTY_ROW_LEFT = ("     ")
+  EMPTY_ROW_RIGHT = ("|      ")
+  EMPTY_ROW_MID = ("|     ")
+  RULE_ROW_LEFT = ("-----")
+  RULE_ROW_RIGHT = ("|-----")
+
+  def set_board_size
+    size = ''
+    puts "Please set board size between 3 to 9: (N for NxN board)"
+    loop do
+      input = gets.chomp.to_s
+      size = input.gsub(/[^0-9]/i, '')
+      break unless size.empty?
+      puts "Please enter a valid number between 3 to 9:"
+    end
+    @board_size = size.to_i
   end
 end
 
@@ -288,9 +316,9 @@ class TTTGame
   end
 
   def initialize(score = 5)
-    @board = Board.new
     @human = Player.new
     @computer = Player.new(:computer)
+    @board = Board.new
     reset_marker
     @score_to_win = score
   end
@@ -378,5 +406,5 @@ class TTTGame
   end
 end
 
-game = TTTGame.new(2)
+game = TTTGame.new(3)
 game.play
