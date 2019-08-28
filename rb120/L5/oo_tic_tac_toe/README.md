@@ -1,8 +1,25 @@
 ## Version history:
 
-v1_improvements.rb - Improved version from the discussion chapter
+v2_bonus_features.rb - Added bonus features (28.08.19)
+    
+    1. Custom user name
+    
+    2. Custom user marker
+    
+       > Please select a marker(A, X, Y, Z, M, Q, @, +, *, $)
+        
+    3. Round base game, ends if either user or computer wins defined amount of rounds
+    
+       > Defeat computer 3 times to win
+       > USER: 0
+       > Computer: 0
+    
+    4. Custom board size. (Implemented in Board class)
+     
 
-v0_assignment.rb - First walkthrough version
+v1_improvements.rb - Improved version from the discussion chapter (26.08.19)
+
+v0_assignment.rb - First walkthrough version (25.08.19)
 
 
 ## Steps of thinking:
