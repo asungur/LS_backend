@@ -132,18 +132,18 @@ end
 Constant string elements:
 
 ```ruby
-empty_left = "     "
-empty_right = "|      "
-empty_mid = "|     "
-rule_left = "-----"
-rule_right = "|-----"
+EMPTY_ROW_LEFT = ("     ")
+EMPTY_ROW_RIGHT = ("|      ")
+EMPTY_ROW_MID = ("|     ")
+RULE_ROW_LEFT = ("-----")
+RULE_ROW_RIGHT = ("|-----")
 ```
 
 Between the constants squares(cells) with values will be printed. Below code returns index values:
 
 ```ruby
 (1..n).each do |i|
-  puts empty_left + empty_mid*(n-2) + empty_right
+  puts EMPTY_ROW_LEFT + EMPTY_ROW_MID*(n-2) + EMPTY_ROW_RIGHT
   value_row = ''
   (1..n).each do |t|
     square_number = ((i-1)*n)+t
@@ -154,8 +154,8 @@ Between the constants squares(cells) with values will be printed. Below code ret
     end
   end
   puts value_row
-  puts empty_left + empty_mid*(n-2) + empty_right
-  puts rule_left + rule_right*(n-2) + rule_right if i != n
+  puts EMPTY_ROW_LEFT + EMPTY_ROW_MID*(n-2) + EMPTY_ROW_RIGHT
+  puts RULE_ROW_LEFT + RULE_ROW_RIGHT*(n-2) + RULE_ROW_RIGHT if i != n
 end
 ```
 Above code will output:
