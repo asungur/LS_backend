@@ -5,9 +5,35 @@ module ClearScreen
 end
 
 class Board
+  attr_reader :winning_lines
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                   [[1, 5, 9], [3, 5, 7]].freeze
+
+  EMPTY_CELLS = {
+  'corner' => %Q(
+     
+  i  
+     
+    ),
+  'top/bottom' => %Q(
+|     |
+|  i  |
+|     |
+    ),
+  'side' => %Q(
+-----
+  i  
+-----
+    ),
+  'centre' => %Q(
+|-----|
+|     |
+|  i  |
+|     |
+|-----|
+    )
+}
 
   def initialize
     @squares = {}
@@ -16,6 +42,20 @@ class Board
 
   def []=(num, marker)
     @squares[num].marker = marker
+  end
+
+  def set_winning_lines(n)
+    winning_lines = []
+    # in n x n grid
+    (1..(n*n)) do |idx|
+      if (idx%n != 1) || (idx%n != 0) || (i<(n*(n-1))) || (i>n)
+        winning_lines << [(i-n-1), i, (i+n+1)] # diagonal \
+        winning_lines << [(i-n), i, (i+n)] # diagonal /
+        winning_lines << [(i-n), i, (i+n)] # column
+        winning_lines << [(i-1), i, (i+1)] # row
+      end
+    end
+    @winning_lines = remove_duplicates(winning_lines)
   end
 
   def unmarked_keys
@@ -73,6 +113,16 @@ class Board
     puts "     |     |"
   end
   # rubocop:enable Metrics/AbcSize
+
+  private
+
+  def remove_duplicates(arr)
+    arr_return = []
+    arr.each do |sub_arr|
+      arr_return << sub_arr.sort unless arr_return.include? sub_arr.sort
+    end
+    arr_return
+  end
 end
 
 class Square
