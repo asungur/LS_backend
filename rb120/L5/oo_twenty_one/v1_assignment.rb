@@ -293,7 +293,6 @@ class Game
   end
 
   def deal_cards
-    #Potential message here
     2.times do 
       player.hand << deck.distribute
       dealer.hand << deck.distribute
