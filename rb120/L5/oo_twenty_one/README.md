@@ -17,7 +17,7 @@ Here is an overview of the game:
 Nouns: card, player, dealer, participant, deck, game, calculate_total
 Verbs: deal, hit, stay, busts(not an action)
 ```
-### **Basic hierarchy:**
+### **Example hierarchy:**
 ```
 Player
 - hit
@@ -39,88 +39,224 @@ Game
 ```
 Note the number of actions `Player` and `Dealer` share. (Possibly a superclass?)
 
+### **Proposed hierarchy:**
+```
+Card
+- value
+- display_name
+Deck
+- shuffle
+- distribute (this can be shared between deck and hand ex: deck sends, hand receives)
+Hand (as a module, contains shared behaviour)
+- hit
+- calculate_hand
+- busted?
+- reset
+Participant (super-class, contains hand, total of cards and score)
+Player < Participant
+- turn
+- display cards
+- choose name
+Dealer < Participant
+- turn
+- display cards (not similar to Player.display_cards)
+Game
+-start
+```
+Note the number of actions `Player` and `Dealer` share. (Possibly a superclass?)
+
 ### **Spike:**
 ```ruby
-class Player
-  def initialize
-    # what would the "data" or "states" of a Player object entail?
-    # maybe cards? a name?
-  end
-
-  def hit
-  end
-
-  def stay
-  end
-
-  def busted?
-  end
-
-  def total
-    # definitely looks like we need to know about "cards" to produce some total
-  end
+module Utilities
+  # Prompt, screen clear
 end
 
-class Dealer
+class Card
+ 
+  SUITS =
+  FACES =
+
   def initialize
-    # seems like very similar to Player... do we even need this?
   end
 
-  def deal
-    # does the dealer or the deck deal?
+  def calculate_value
+    
   end
-
-  def hit
+  
+  def display_face
+    
   end
-
-  def stay
-  end
-
-  def busted?
-  end
-
-  def total
-  end
-end
-
-class Participant
-  # what goes in here? all the redundant behaviors from Player and Dealer?
 end
 
 class Deck
   def initialize
-    # obviously, we need some data structure to keep track of cards
-    # array, hash, something else?
+    shuffle_deck
   end
 
-  def deal
-    # does the dealer or the deck deal?
+  def distribute
+    deck.pop
+  end
+
+  private
+
+  def shuffle_deck
+    # sends two cards
   end
 end
 
-class Card
+
+module Hand
+  def hit(deck)
+
+  end
+
+  def calculate_hand
+
+  end
+
+  def busted?
+
+  end 
+  
+  def reset
+    # resets hand
+  end
+end
+
+class Participant
+  # contains shared states: hand, card_total, score
+end
+
+class Player < Participant
   def initialize
-    # what are the "states" of a card?
+    super
+    name?
+  end
+
+  def display_cards
+
+  end
+
+  def turn(deck)
+    loop do
+      # has to be intuitive unlike dealer version of turn(deck)
+    end
+  end
+
+
+  private
+
+  def name?
+
+  end
+  
+  def choose_move
+    # Hit or stay
   end
 end
 
-class Game
-  def start
-    # what's the sequence of steps to execute the game play?
+class Dealer < Participant
+  def initialize
+    super
+  end
+
+  def turn(deck)
+    while cards_total < (Maximum score - Treshold)
+    # automated version of Player.turn(deck)
+  end
+
+  def display_cards
+  # One card is face-down always
   end
 end
 
-Game.new.start
 ```
 ### **Orchestration engine:**
 ```ruby
 class Game
-  def start
-    deal_cards
-    show_initial_cards
-    player_turn
-    dealer_turn
-    show_result
+  MAX_SCORE = 21
+  ROUNDS_TO_WIN = 2
+  DEALER_TRESHOLD = 5
+
+  def initialize
+    @deck = Deck.new
+    @dealer = Dealer.new
+    @player = Player.new
   end
+
+
+  def play # play loop
+    display_welcome_message
+    loop do
+      game_loop
+      display_grand_winner
+      break unless play_again?
+      restart_game
+    end
+    display_goodbye_message
+  end
+
+  private
+
+  def play_again?
+  end
+
+  def game_loop
+    loop do
+      display_score
+      deal_cards
+      show_initial_cards
+      player.turn
+      dealer.turn
+      update_score
+      display_result unless (dealer.busted? || player.busted?)
+      display_winner
+      break if grand_winner?
+      prepare_table
+    end
+  end
+
+  def display_welcome_message
+  end
+
+  def display_goodbye_message
+  end
+
+  def deal_cards
+    2.times do 
+      player.hand << deck.distribute
+      dealer.hand << deck.distribute
+      player.calculate_hand
+      dealer.calculate_hand
+    end
+  end
+
+  def display_score
+
+  end
+
+  def display_cards
+  
+  end
+  
+  def winner
+
+  end
+
+  def display_winner
+
+  end
+
+  def update_score
+
+  end
+
+  def grand_winner
+  end
+
 end
+
+game = Game.new.play
+
+
 ```
