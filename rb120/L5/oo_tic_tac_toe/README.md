@@ -1,5 +1,13 @@
 ## Version history:
 
+v3_computer_smart_moves.rb - Ammended comments (31.08.19)
+    
+    1. Undetected winning lines fix
+    
+    2. Computer behaviour included
+    
+    3. Adaptive winning lines
+
 v2_bonus_features.rb - Added bonus features (28.08.19)
     
     1. Custom user name
