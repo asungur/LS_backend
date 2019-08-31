@@ -1,6 +1,6 @@
 module Utilities
   def prompt(message)
-    puts "=> #{ message }"
+    puts "=> #{message}"
   end
 
   def screen_clear
@@ -17,7 +17,7 @@ module Utilities
     output_string = ''
     last_word = text_arr[-1]
     text_arr[0...-1].each do |word|
-      output_string << word + ', ' 
+      output_string << word + ', '
     end
     output_string + connector + ' ' + last_word
   end
@@ -29,11 +29,11 @@ class Card
     'H' => 'Hearts',
     'S' => 'Spades',
     'C' => 'Clubs',
-    'D' => 'Diamonds',
-          }
+    'D' => 'Diamonds'
+  }
   FACES = %w(2 3 4 5 6 7 8 9 J Q K A)
 
-  def initialize(suit,face)
+  def initialize(suit, face)
     @face = face
     @suit = suit
     @value = calculate_value
@@ -47,7 +47,7 @@ class Card
     else @face.to_i
     end
   end
-  
+
   def display_face
     case face
     when 'J' then 'Jack'
@@ -83,13 +83,12 @@ class Deck
     deck = []
     Card::SUITS.keys.each do |suit|
       Card::FACES.each do |face|
-        deck << Card.new(suit,face)
+        deck << Card.new(suit, face)
       end
     end
     @deck = deck.shuffle
   end
 end
-
 
 module Hand
   def hit(deck)
@@ -102,15 +101,15 @@ module Hand
     total = 0
     hand.each { |card| total += card.calculate_value }
     hand.each do |card|
-      total -= 10 if (total > Game::MAX_SCORE && card.display_face == 'Ace')
+      total -= 10 if total > Game::MAX_SCORE && card.display_face == 'Ace'
     end
     @cards_total = total
   end
 
   def busted?
     cards_total > Game::MAX_SCORE
-  end 
-  
+  end
+
   def reset
     @hand = []
     @cards_total = 0
@@ -137,7 +136,7 @@ class Player < Participant
   end
 
   def display_cards
-    prompt("You have #{ join(hand.map { |card| card.display_name }) }")
+    prompt("You have #{join(hand.map(&:display_name))}")
   end
 
   def turn(deck)
@@ -150,7 +149,7 @@ class Player < Participant
       puts ""
       sleep(1)
       display_cards
-      prompt("Current total: #{ cards_total }")
+      prompt("Current total: #{cards_total}")
       break if busted? || cards_total == Game::MAX_SCORE
     end
   end
@@ -173,10 +172,10 @@ class Player < Participant
     screen_clear
     @name = name
   end
-  
+
   def choose_move
     choice = ''
-    prompt("Choose hit or stay: (#{ join(VALID_CHOICES, 'or') })")
+    prompt("Choose hit or stay: (#{join(VALID_CHOICES, 'or')})")
     loop do
       choice = gets.chomp.to_s.downcase
       break if VALID_CHOICES.include? choice
@@ -216,7 +215,7 @@ class Dealer < Participant
                         card.display_name
                       end
     end
-    prompt("Dealer has #{ join(card_display) }")
+    prompt("Dealer has #{join(card_display)}")
   end
 
   def display_busted
@@ -227,7 +226,7 @@ end
 class Game
   include Utilities
   MAX_SCORE = 21
-  ROUNDS_TO_WIN = 2
+  ROUNDS_TO_WIN = 5
   DEALER_TRESHOLD = 5
   attr_reader :deck, :player, :dealer
 
@@ -236,7 +235,6 @@ class Game
     @dealer = Dealer.new
     @player = Player.new
   end
-
 
   def play
     display_welcome_message
@@ -267,14 +265,10 @@ class Game
       display_score
       deal_cards
       show_initial_cards
-      player.turn(deck)
-      player.display_busted if player.busted?
-      unless player.busted? || player.cards_total == MAX_SCORE
-        dealer.turn(deck)
-        dealer.display_busted if dealer.busted?
-      end
+      player_turn
+      dealer_turn unless player_ends_round
       update_score
-      display_result unless (dealer.busted? || player.busted?)
+      display_result unless dealer.busted? || player.busted?
       display_winner
       break if grand_winner?
       press_to_continue
@@ -282,18 +276,32 @@ class Game
     end
   end
 
+  def player_turn
+    player.turn(deck)
+    player.display_busted if player.busted?
+  end
+
+  def player_ends_round
+    player.busted? || player.cards_total == MAX_SCORE
+  end
+
+  def dealer_turn
+    dealer.turn(deck)
+    dealer.display_busted if dealer.busted?
+  end
+
   def display_welcome_message
-    prompt("Welcome to #{ MAX_SCORE }, #{player.name}!")
-    prompt("Defeat Dealer #{ ROUNDS_TO_WIN } times to win!")
+    prompt("Welcome to #{MAX_SCORE}, #{player.name}!")
+    prompt("Defeat Dealer #{ROUNDS_TO_WIN} times to win!")
     press_to_continue
   end
 
   def display_goodbye_message
-    prompt("Thanks for playing #{ MAX_SCORE }. Goodbye!")
+    prompt("Thanks for playing #{MAX_SCORE}. Goodbye!")
   end
 
   def deal_cards
-    2.times do 
+    2.times do
       player.hand << deck.distribute
       dealer.hand << deck.distribute
       player.calculate_hand
@@ -304,7 +312,7 @@ class Game
   def display_score
     screen_clear
     puts "SCORE:"
-    prompt("#{ player.name }: #{ player.score } | Dealer : #{ dealer.score }")
+    prompt("#{player.name}: #{player.score} | Dealer : #{dealer.score}")
     puts " "
   end
 
@@ -326,14 +334,14 @@ class Game
       'dealer'
     elsif dealer.busted? || player_outscored?
       'player'
-    elsif (player.cards_total == dealer.cards_total)
-    'tie'
+    elsif player.cards_total == dealer.cards_total
+      'tie'
     end
   end
 
   def display_winner
     case winner
-    when 'player' then prompt("#{ player.name } won the round!")
+    when 'player' then prompt("#{player.name} won the round!")
     when 'dealer' then prompt("Dealer won the round!")
     else prompt("No winner this round! It's a tie.")
     end
@@ -361,15 +369,17 @@ class Game
   def display_result
     screen_clear
     player.display_cards
-    prompt("#{ player.name } has total : #{ player.cards_total }")
+    prompt("#{player.name} has total : #{player.cards_total}")
     puts ""
     sleep(1)
-    unless player.cards_total == MAX_SCORE
-      dealer.display_cards(true)
-      prompt("Dealer has total : #{ dealer.cards_total }")
-      puts ""
-      sleep(1)
-    end
+    display_dealer unless player.cards_total == MAX_SCORE
+  end
+
+  def display_dealer
+    dealer.display_cards(true)
+    prompt("Dealer has total : #{dealer.cards_total}")
+    puts ""
+    sleep(1)
   end
 
   def grand_winner?
@@ -380,14 +390,13 @@ class Game
     case ROUNDS_TO_WIN
     when player.score then player.name
     when dealer.score then 'Dealer'
-    else nil
     end
   end
 
   def display_grand_winner
     press_to_continue
-    prompt("The grand winner is #{ grand_winner }!")
+    prompt("The grand winner is #{grand_winner}!")
   end
 end
 
-game = Game.new.play
+Game.new.play

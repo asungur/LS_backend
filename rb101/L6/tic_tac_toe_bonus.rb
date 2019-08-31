@@ -112,7 +112,6 @@ def computer_places_piece!(brd)
   sqr = strategy(brd, PLAYER_MARKER) if !sqr
   sqr = 5 if !sqr && brd[5] == INITIAL_MARKER
   sqr = empty_squares(brd).sample if !sqr
-
   brd[sqr] = COMPUTER_MARKER
 end
 
