@@ -20,7 +20,7 @@ class Order
   end
   
   def total
-    total_cost = @burger + @side + @drink
+    total_cost = @burger.cost + @side.cost + @drink.cost
     format("$%.2f", total_cost)
   end
 end
@@ -41,12 +41,12 @@ class MealItem
     self.class::OPTIONS
   end
   
-  def self.to_s
-    self::OPTIONS[@option][:name]
+  def to_s
+    self.class::OPTIONS[@option][:name]
   end
   
   def cost
-    @option[:cost]
+    self.class::OPTIONS[@option][:cost]
   end
 end
 
@@ -78,4 +78,4 @@ end
 
 alican = Customer.new.place_order
 
-puts alican
+puts alican.total
