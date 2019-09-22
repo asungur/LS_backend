@@ -7,8 +7,13 @@
 def each(arr)
   counter = 0
   while counter < arr.size
-    yield(array[counter])
+    yield(arr[counter])
     counter += 1
   end
-  array
+  arr
+end
+
+
+each([1, 2, 3, 4, 5]) do |num|
+  puts num
 end
