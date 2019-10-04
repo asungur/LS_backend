@@ -1,3 +1,1 @@
-Personal collection of LS files, tutorials and notes
-
-rb101 - Exercises and Tutorials of Ruby fundamentals
+Personal collection of files, tutorials and notes from LS Studies
