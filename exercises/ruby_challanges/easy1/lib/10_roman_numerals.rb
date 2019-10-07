@@ -10,14 +10,19 @@ class Integer
     "XL" => 40,
     "X" => 10,
     "IX" => 9,
-    "V" => 5
+    "V" => 5,
     "IV" => 4,
     "I" => 1
   }
   def to_roman
-    str = ''
+    roman_numeral = ''
     number = self
-    ROMAN_NUMERAL_RULES.each do |key,value|
-      roman_number = number / value
-      number = number % value
-    
+    ROMAN_NUMERAL_RULES.each do |roman_number,value|
+      number_of_roman_letters = number / value
+      roman_numeral += roman_number * number_of_roman_letters
+      number -= number_of_roman_letters * value
+    end
+    roman_numeral
+  end
+end
+
