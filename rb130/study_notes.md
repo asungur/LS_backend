@@ -185,3 +185,51 @@ Lets look into the process that converts `(&:to_s)` into `{ |num| num.to_s }`
 1. When we prepend and object with `&`, Ruby try to convert it into a block. It does this by calling `#to_proc` unless the given object is a Proc object.
 2. Since `:to_s` is a symbol not a proc, Ruby will call `Symbol#to_proc` method on this.
 To sum up, `:to_s` symbol first converted to a proc, then converted to a block which results into `{ |n| n.to_s }`
+
+
+# Testing with Minitest
+
+## Testing terminalogy
+
+**Regression testing** is the primary reason that we write tests. These check for bugs that occur in formerly working code after any changes been made in the codebase. By using predefined tests to check for bugs we don't have to verify everything manually after changing the codebase.
+
+**Assertion** is a verification step to confirm that the results returned by a program or application match the expected results.
+**Test Suite** is a group or set of situations or contexts within which verification checks are made.
+**Test** is a situation or context in which verification checks are made. For example, making sure you get an error message after trying to log in with the wrong password. May require multiple steps.
+
+## Minitest vs RSpec
+
+**RSpec** uses Domain Specific Language (DSL) for writing tests. It is a popular application as it allows users to write code that reads like a natural English
+
+**Minitest** uses Ruby and it is included in later versions of Ruby.
+
+## Seat Approach
+
+**SEAT Approach** is a testing methodology to optimise test workflow by automating redundant steps. It consists of following four steps:
+
+  * **S**et up the necessary objects.
+  * **E**xecute the code against the object we're testing.
+  * **A**ssert the results of the execution.
+  * **T**ear down and clean up any lingering artifacts.
+
+## Assertions
+
+**Assertion** is a verification step to confirm that the results returned by a program or application match the expected results.
+
+We can test **equality** by using 'assert_equal'. This will call `==` method on the object. However to test if the objects are the same we use `assert_same` assertion
+
+## Code coverage
+
+Code coverage is a metric to assess code quality. It measures how much of a program is tested by a test suite.
+
+# Core Tools/ Packaging Code
+
+## Purpose of Core Tools
+
+  * **Bundler** Lets you manage the various dependencies in a Ruby project.
+  * **Rake** Automates common functions required to build, test, package, and install programs.
+  * **RVM** and **Rbenv** Lets you install, manage, and use multiple versions of Ruby.
+  * **Rubygems** are packages of code that you can download, install, and use in your Ruby programs or from the command line.
+
+We use `bundle exec` to deal with the conflict between the gem versions in use and `Gemfile.lock` versioning info. `bundle exec` will make sure that the gems specified in the Gemfile are available to our program.
+
