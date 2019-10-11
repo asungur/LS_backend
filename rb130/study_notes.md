@@ -168,5 +168,20 @@ At the above code, we defined a `test` method that yields the block and passes i
 There are three tests:
   * At the first case we provided equal amount of arguments to number of parameters of the block. This is the ideal scenario
   * At the second case, method yields the block with two arguments where as the block has two parameters. The value `nil` will be assigned to `obj3` and no exception will be raised.
-  * At the last case, yield passes in more arguments than the parameters defined by the block. This will not raise an exception and the arguments will be assigned to block paramters in the given order. Since `object1` is the first argument passed in by `yield` it will be assigned to `obj1`.
+  * At the last case, `yield` passes in more arguments than the parameters defined by the block. This will not raise an exception and the arguments will be assigned to block paramters in the given order. Since `object1` is the first argument passed in by `yield` it will be assigned to `obj1`.
 
+## Symbol to proc
+
+When working with collections, we often want to do mass manipulations on the whole data set. An example:
+
+```ruby
+[1, 2, 3, 4, 5].map { |num| num.to_s }             # => ['1', '2', '3', '4', '5']
+```
+There is a shortcut into that
+```ruby
+[1, 2, 3, 4, 5].map(&:to_s)                        # => ['1', '2', '3', '4', '5']
+```
+Lets look into the process that converts `(&:to_s)` into `{ |num| num.to_s }`
+1. When we prepend and object with `&`, Ruby try to convert it into a block. It does this by calling `#to_proc` unless the given object is a Proc object.
+2. Since `:to_s` is a symbol not a proc, Ruby will call `Symbol#to_proc` method on this.
+To sum up, `:to_s` symbol first converted to a proc, then converted to a block which results into `{ |n| n.to_s }`
