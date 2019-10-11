@@ -14,3 +14,48 @@ There are 3 main ways to work with closures in Ruby:
 2. Using **lambdas**
 3. Using **blocks**
 
+## How do blocks work and where we want to use them?
+
+Blocks are commonly used in Ruby by passing in `{ ... }` or `do ... end` into methods as arguments. Every method in ruby can take block arguments, but it's implementation is what's important and makes the difference.
+
+```ruby
+def hello
+  "hello!"
+end
+
+hello                       # => "hello!"
+hello("hi")                 # => ArgumentError: wrong number of arguments (1 for 0)
+hello { puts 'hi' }         # => "hello!"
+```
+Passing an implicit block is different than passing an argument to a method. In the above code, `hello { puts 'hi' }` will not raise an error, however since the use of block is not defined, it will not have an impact on the return value of the method.
+
+```ruby
+def hello
+  "hello! " + yield
+end
+
+hello { 'hi!' }         # => "hello! hi!"
+```
+**yielding** is one of the ways we can execute the block argument passed-in to our method. We do this by using `yield` keyword. In the above code, `yield` executes the block which returns the string object with the value `hi!"`. This will be added to `"hello! "` string object and returned by the method `hello`.
+
+There two common use scenarios of **blocks** in ruby.
+
+1. Leaving implementation decisions ot method invocation time. We can create generic methods which can have a variety of uses.
+
+```ruby
+my_arr = %w(Moya tim Jonathan)
+
+my_arr.select { |name| name.size > 3}
+my_arr.select { |name| name == name.capitalize }
+```
+`Array#select` method is a good example of scenario 1. Only rule defined by this method is that it passes each object to the given method block and appends the object into a new array if the return value of the block is truthy.
+
+2. **Sandwich code** use when we need before and after actions.
+
+```ruby
+def modify_text_file
+  # open the file
+  yield # implement block
+  # close the file
+end
+```
