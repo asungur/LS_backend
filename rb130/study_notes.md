@@ -108,6 +108,6 @@ end
 a = Proc.new { "the first proc" }
 b = Proc.new { "the second proc" }
 
-test1(a,b)
-test2 { "I'm a lonely block." }
+test1(a,b)                              # => We are the first proc and the second proc.
+test2 { "I'm a lonely block." }         # => I'm a lonely block.
 ```
