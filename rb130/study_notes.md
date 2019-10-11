@@ -150,4 +150,23 @@ test2 { "I'm a lonely block!" }  #=> Step 1 \n What's &block? I'm a lonely block
 
 ## Arguments and return values with blocks
 
+The rules around enforcing the number of arguments you can call on a closure in Ruby is called **arity**. These rules differ between **Proc objects**, **lambdas** and **blocks**.
+
+Blocks are more forgiving in terms of arity. Unlike method definitions they will not raise `ArgumentError` when different number of arguments are passed in.
+
+```ruby
+def test
+  yield('object1', 'object2')
+end
+
+test { |obj1, obj2| p obj1, obj2 }                # => 'object1' 'object2'
+test { |obj1, obj2, obj3| p obj1, obj2, obj3 }    # => 'object1' 'object2' nil
+test { |obj1| p obj1 }                            # => 'object1'
+```
+At the above code, we defined a `test` method that yields the block and passes in two arguments; string objects `'object1'` and `'object2'`.
+
+There are three tests:
+  * At the first case we provided equal amount of arguments to number of parameters of the block. This is the ideal scenario
+  * At the second case, method yields the block with two arguments where as the block has two parameters. The value `nil` will be assigned to `obj3` and no exception will be raised.
+  * At the last case, yield passes in more arguments than the parameters defined by the block. This will not raise an exception and the arguments will be assigned to block paramters in the given order. Since `object1` is the first argument passed in by `yield` it will be assigned to `obj1`.
 
