@@ -59,3 +59,28 @@ def modify_text_file
   # close the file
 end
 ```
+
+## Blocks and Variable Scope
+
+Blocks can keep track of variables, constants and methods that are in the same scope with the block. By keeping track of the **binding** , blocks have all the information ready in case it needed during the execution of the code.
+
+```ruby
+
+my_str = '231249120awds'
+
+def test(str)
+  str + '.1132'
+end
+
+my_arr = [1, 2, 3 ]
+
+def modify(arr)
+  arr.map { |item| yield(item) }
+end
+
+modify(my_arr) do
+  # do sth
+end
+```
+For instance, in the example above all `my_str`, `test` method, `my_arr` and `modify` method are part of the **binding**
+
