@@ -84,3 +84,30 @@ end
 ```
 For instance, in the example above all `my_str`, `test` method, `my_arr` and `modify` method are part of the **binding**
 
+## Write methods that use blocks and procs (and lambdas)
+
+  * **Lambdas** are instances of **Proc** class. In other words both are **Proc** objects. An implicit block is a **chunk of code** and is not an Object. It is type of closure.
+
+  * **Lambdas** enforce the number of arguments passed to them. Implicit blocks and **Procs** do not enforce the number of arguments passed in.
+
+  * When we pass blocks **explicitly** as an argument to a method, we automatically convert it to a proc. We use `&block` to do that. Then we use `Proc#call` method to execute the code in the initial block. To execute **implicit** blocks we use `yield`.
+
+  * One of the main advantages of passing in Proc objects is that we can call multiple **Proc** objects in the same method.
+
+For instance:
+```ruby
+def test1(proc1, proc2)
+  puts "We are #{proc1.call} and #{proc2.call}."
+end
+
+
+def test2
+  puts yield
+end
+
+a = Proc.new { "the first proc" }
+b = Proc.new { "the second proc" }
+
+test1(a,b)
+test2 { "I'm a lonely block." }
+```
