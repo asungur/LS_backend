@@ -111,3 +111,43 @@ b = Proc.new { "the second proc" }
 test1(a,b)                              # => We are the first proc and the second proc.
 test2 { "I'm a lonely block." }         # => I'm a lonely block.
 ```
+## Methods with an explicit block parameter
+
+Already discussed above, but lets test this concept with a simpler example:
+
+```ruby
+def test(&block)
+  puts "What's &block? #{block}"
+end
+
+test { "I'm a lonely block!" }    #=> What's &block? #<Proc:0x000000000231cf98...>
+```
+This shows how '&block' keyword converts the given block to a Proc object. We can execute the block by calling `Proc#call` method:
+
+```ruby
+def test(&block)
+  puts "What's &block? #{block.call}"
+end
+
+test { "I'm a lonely block!" }    #=> What's &block? I'm a lonely block!
+```
+While we can not do anything other than **yielding** an implicit block, we can make use of explicit block by passing it into another method.
+
+```ruby
+def test(block)
+  puts "What's &block? #{block.call}"
+end
+
+def test2(&block)
+  puts "Step 1"
+  test(block)
+  puts "Step 3"
+end
+
+test2 { "I'm a lonely block!" }  #=> Step 1 \n What's &block? I'm a lonely block! \n Step 3
+
+```
+
+## Arguments and return values with blocks
+
+
