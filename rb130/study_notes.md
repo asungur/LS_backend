@@ -53,11 +53,14 @@ my_arr.select { |name| name == name.capitalize }
 2. **Sandwich code** use when we need before and after actions.
 
 ```ruby
-def modify_text_file
-  # open the file
-  yield # implement block
-  # close the file
+def time_before_after
+  before = Time.now
+  yield
+  after = Time.now
+  puts after - before
 end
+
+time_before_after { sleep(3) }
 ```
 
 ## Blocks and Variable Scope
@@ -232,4 +235,14 @@ Code coverage is a metric to assess code quality. It measures how much of a prog
   * **Rubygems** are packages of code that you can download, install, and use in your Ruby programs or from the command line.
 
 We use `bundle exec` to deal with the conflict between the gem versions in use and `Gemfile.lock` versioning info. `bundle exec` will make sure that the gems specified in the Gemfile are available to our program.
+
+**Gemfile** includes:
+
+  * Where should Bundler look for RubyGems that it needs to install. We provide this by typingin `source 'https://rubygems.org'`
+  * Optional gemspec file.  An actual gemspec file is prefixed with the project name such as `test_prohect.gemspec`
+  * What version of Ruby that we need, by typing in `ruby '2.2.0'`
+  * What RubyGem(s) does our program use? for instance, `gem 'minitest-reporters', '~> 1.1'`
+ After we create a `Gemfile` the `bundle install` command scans and install all dependencies. It also creates a `Gemfile.lock` that contains all the dependency information
+
+
 
