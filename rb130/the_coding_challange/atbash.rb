@@ -2,8 +2,8 @@ class Atbash
   ALPHABET = ('a'..'z').to_a.freeze
 
   def self.encode(string)
-    @inscription = cleanup(string)
-    @translation = encode_str(@inscription)
+    inscription = cleanup(string)
+    encode_str(inscription)
   end
 
   def self.cleanup(string)
@@ -33,3 +33,4 @@ class Atbash
     sliced_arr.map(&:join).join(' ')
   end
 end
+
