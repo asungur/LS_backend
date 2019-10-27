@@ -8,8 +8,7 @@ class Crypto
   end
 
   def size
-    plain_text_size = @normalized_plaintext.size
-    Math.sqrt(plain_text_size).ceil
+    Math.sqrt(@normalized_plaintext.size).ceil
   end
 
   def plaintext_segments
