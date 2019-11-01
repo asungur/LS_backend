@@ -32,4 +32,4 @@ function server () {
 
 coproc SERVER_PROCESS { server; }
 
-nc -lkv 8080 <&${SERVER_PROCESS[0]} >&${SERVER_PROCESS[1]}a
+nc -lkv 8080 <&${SERVER_PROCESS[0]} >&${SERVER_PROCESS[1]}
