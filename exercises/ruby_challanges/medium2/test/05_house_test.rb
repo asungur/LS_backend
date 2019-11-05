@@ -98,3 +98,4 @@ that lay in the house that Jack built.
     assert_equal expected, House.recite
   end
 end
+
