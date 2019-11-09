@@ -15,7 +15,8 @@ Types of devices communicating over Internet and the software these devices use 
 
 * **Latency** is **the amount of time** that it takes for data to travel from one point to another.
 To determine the overall latency of a network connection we measure delay. There are different types of delay sum of which defines the 
-total latency. (*Propagation delay, Transmission delay, Processing delay, Queuing delay*)
+total latency. (*Propagation delay, Transmission delay, Processing delay, Queuing delay*).
+Latency is something that every software engineer need to take into account(and optimise) since it has a significant impact on performance of networked applications.
 * **Bandwidth** is **the amount of data** that can be transferred from a device at once.
 * **Bit rate** is **the amount of bits** that can be transferred by a device over a given period of time.
 * A **Network hop** is the transfer of data from one node to another. Data does not neccesarily follow a direct path on the network. It moves from one node to another (one network hop at a time) depending on network availability.
@@ -46,18 +47,57 @@ Header of the PDU includes source and destination **MAC Addresses** which are th
 * **IP address** are hierarchical compared to MAC addresses, and can be can be dynamically assigned to a device as it joins the network.
   * The hierarchical logic of IP address works similar to post codes. This layered structure makes routing easier through finding the network first by searching if the IP address belongs to this network(network address). Machines on the same network share this address as part of their IP address. This is followed by an IP look-up to identify the device that message to be delivered to.
   * There are two versions of IP addressing currently in use. **IPv4** and **IPv6**. The former is an earlier version put in use around 80s where as the latter one is developed mid 2000s to overcome the limititation in total number of devices that IPv4 support.
-* **Network port** is an identifier for an application or a process to run on a host.
+* **Network port** is an identifier for an application or a process to run on a host. They add further detail to inter-network communication based on IP addressing.
 
 ## DNS and how it works
 
-
+**DNS(Domain Naming System)** is a distributed database responsible for translation of URLs such as `https://twitter.com` to an IP address and mapping the request to a remote server.This database of URLs and their corresponding IP Addressess are stored on DNS servers. The idea behind DNS is distributing this database between hierarchically organised DNS servers worldwide, because practically no single server can maintain the whole database.
 
 ## Client-server model of web interactions and the role of HTTP protocol within the model
 
+* A simple web interaction occurs between the client(web browser) and the server(receiver of the request) in form of request/response cycle.
+* The client and the server follows HTTP protocol so that server can understand the components of client's request, and respond back in a form that also follows HTTP protocol.
+* This cycle forms the basis of modern web interaction where HTTP is at the core, ensuring uniformity to resource transfer between applications.
+* **Resource** is a broad term meaning the data that we interact with on Internet. It can be in the form of files, web pages, software, etc.
+
 # TCP & UDP
 ## TCP and UDP protocols, and their comparison
+* Transport layer forms a reliable network communication on top of an unreliable channel(of Physical layer and Link/Data Link layers)
+* This helps us hide the complexity of forming a reliable network communication from the application layer.
+* **TCP(Transmission Control Protocol)** and **UDP(User Datagram Protocol)** are two common protocols we use at this layer.
+* **TCP** is a connection-oriented protocol, provides:
+  * Multiplexing and demultiplexing
+  * In order delivery
+  * De-duplication
+  * Message acknowledgement and retransmission
+  * Error detection
+* **UDP** is a connectionless protocol, provides:
+  * Multiplexing and demultiplexing
+  * Error detection
+* **TCP** is more reliable compared to UDP. However, this brings the cost of latency overhead of establishing a connection and the the risk of Head-of-line blocking due to in-order delivery.
+* **UDP** is faster and simpler compared to TCP. Main downside is that it lacks the functionality of TCP. In use of UDP, it is software engineers decision/responsibility to build-up these functionality at the top of UDP when/if they needed.
+* The main(and important) similarity of TCP/UDP is multiplexing/demultiplexing which forms the core of reliability on an unreliable communication channel. 
+* **Miltiplexing** is the idea of multiple signals(essentially data) can be carried over a single channel. Light-waves in different wave lengths carried on the same fiber-optic cable is an example of **multiplexing in physical layer**. In transport layer this happens through **network ports**.
+* A **network socket** is communication end point formed by combining an IP address and a port number
+
 ## Three-way handshake and its use
+
+* TCP uses Three-way handshake to establish a reliable connection between the client and the host.
+* PDUs that TCP use are called **Segments**
+* Segment header contains various information such as Source and Destination port as well as **SYN** and **ACK** flags that are used during Three-way handshake.
+* **SYN** stands for Synchronise
+* **ACK** stands for Acknowledgement
+
+1. Sender(the client, wants to form the connection) sends a SYN message(sets SYN flag to 1).
+2. Receiver(the server, confirms that message is received) answers back a SYN ACK message(both SYN and ACK flags are set to 1).
+3. Sender(acknowledging the response) sends back an ACK message(ACK flag is set to 1).
+
+After Three-way handshake sender starts sending the application data.
+
 ## Flow control and congestion avoidance
+
+
+
 
 # URLs
 ## Components of URL, query strings
