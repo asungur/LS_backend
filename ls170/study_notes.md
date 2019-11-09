@@ -96,11 +96,31 @@ After Three-way handshake sender starts sending the application data.
 
 ## Flow control and congestion avoidance
 
-
-
+* **Flow control** is an important mechanism of TCP protocol, protecting receiver from being overwhelmed by the receiver sending too much data in one go.
+* By setting the **Window** field of a TCP segment, receiver can inform the user about the amount of data it wants to accept.
+* This mechanism focuses on capabilities of the sender and the receiver, does not concern overwhelming the underlying network
+* Packages hop between network nodes where they get processed.
+* A router runs a checksum at each hop and trasfer data to next node. Due to routers processing capability, packages queue to be processed and if the queue is full they get dropped.
+* In case data getting lost, sender sends same packages in a certain frequency until it receives an acknowledgement message for the initial package it sent.
+* TCP control this process by congestion window and when data flow is overloaded, windows size decreases to reduce the amount of data being sent in one go.
+* This is how TCP deals with network overloading.
 
 # URLs
 ## Components of URL, query strings
+
+* **URL(Uniform Resource Locator)** is the most widely used part of **URI(Uniform Resource Identifier)**
+* URL sets how resources located.
+* For URL: `http://www.example.com:88/home?item=book`
+* `http`: The **scheme** specifies how to access the resource by the web client. Although used interchangibly with the protocol, scheme sets which protocol to be used to access the resource.
+* `example.com`: The **host** or domain name used by the DNS, and mapped into an IP address. Informs client where to look at for the resource.
+* `:88` The **port** or the port number specifies which port to be used. It is an optional part of the URL, if not entered the default port number will be used by the request.
+* `/home/`: The **path** is used to tell the server that where the requested resource is located in the server.
+* `?item=book`: The **query string** is made out of **query parameters**. This optional part of the URL is used to transfer data through the URL.
+
+* We use `?` character to mark the beginning of the **query string**.
+* `item=book` is a parameter name/value pair.
+* we can chain query paramters with `&` reserved character.
+
 ## Constructing a valid URL
 ## URL encoding and its use
 
