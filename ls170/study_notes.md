@@ -106,7 +106,7 @@ After Three-way handshake sender starts sending the application data.
 * This is how TCP deals with network overloading.
 
 # URLs
-## Components of URL, query strings
+## Components of URL, query strings and constructing a valud URL
 
 * **URL(Uniform Resource Locator)** is the most widely used part of **URI(Uniform Resource Identifier)**
 * URL sets how resources located.
@@ -121,16 +121,84 @@ After Three-way handshake sender starts sending the application data.
 * `item=book` is a parameter name/value pair.
 * we can chain query paramters with `&` reserved character.
 
-## Constructing a valid URL
 ## URL encoding and its use
+
+* URL format only accepts certain characters of ASCII character set.
+* Some unsafe characters such as whitescape or reserved( `/ ? : @ &`) characters required to be encoded.
+* **URL encoding** replace these characters with `%` and two hexadecimal digits.
+* One common example is the search functionality of a web page.
+* When we submit `iphone + 32gb + white` it will be encoded into `?search=iphone+%2B+32gb+%2B+white`
 
 # HTTP and the Request/Response Cycle
 ## HTTP requests and responses, and their components
-## Description of HTTP request/response cycle
+
+* An example **HTTP request** consist of:
+  * `GET`: HTTP contains certain methods that instruct server to carry out. `GET` is an example request that is used when the client requests to retrieve certain information.
+  * `/path/`: **Path** specifies the location of the requested resource on the server. Optionally, it can contain the query string to submit more details to the server.
+  * `HTTP/1.1`: **HTTP version**. Specifiying which version of HTTP is used helps server to process the request. If submitted HTTP version is not supported by the server, an error might be raised.
+  * `Host: google.com`: Host header contains the domain. It is required to submit the Host header as part of an HTTP/1.1 request.
+* An example **HTTP response** consist of:
+  * `HTTP/1.1`: **HTTP version** that is used by both the client and the server, and they are communicating on.
+  * `200`: **The status code** represent the status of the response.
+  * `OK`: **Status text**
+  * **Headers** giving more information about the response. It can be describing the date, synthax, structure etc.
+  * **Message body** which contains the raw response data in the form of HTML(Hypertext Markup Language)
+
+## Description of HTTP request/response cycle and `GET` and `POST`
+
+* **HTTP(Hypertext Transfer Protocol)**  provides uniformity to data transfer between the client and the server.
+* HTTP works in request/response cycles.
+* The client sends a request to the server stating the resource.
+* Two common requests are `GET` and `POST` where former is requests for a resource where the latter is submitting data to the server
+* The request must include:
+  * An HTTP method
+  * A path
+  * A host header
+* The server responds back with the requested resources(in response to `GET`) or with the reaction to the `POST` method.
+* The respond include:
+  * A Status code (required)
+  * Header(s) containing additional details (optional)
+  * Response body, containing the resources requested and/or the links to other resources(optional)
+
 ## Status codes and their use(samples)
+
+* **Status code** is a three digit number specifies the way request has been threated.
+* **Status text** is the text below the status code, giving details.
+* Common status codes:
+  * `200` | `OK` 
+  * `302` | `Found`
+  * `404` | `Not Found`
+  * `500` | `Internal Server Error`
+
 ## 'State' in the context of web and techniques to simulate state
-## Difference between `GET` and `POST` and their use cases
+
+* HTTP is a stateless protocol, which means that server does not record the information between each request/response cycle.
+* Instead, each request is processed by the server as a new entity.
+* This makes HTTP and essentially the Internet a distributed but difficult to control. Also, challange for web developers to build stateful web apps.
+* We can simulate state through:
+  * Sending data as parameters through the URL.
+  * By using sessions.
+  * By using cookies.
+  * By making AJAX(Asynchronous JavaScript) calls.
+* Session-id is one way to simulate state where server send a unique token to the client.
+* Client uses this token(Session Identifier or Session Id) as part of its request which allows server to identify the client.
 
 # Security
 ## Various security risks that can affect HTTP, and strategies been developed against these risks
+
+* HTTP being a text based protocol allows third parties can access key elements.
+* **Session Hijacking** is when a third party access user's session through using its session id. It is difficult to identify session hijacking as both user and the hacker share the same session.
+* **Countermeasures**:
+  * Resetting session and using authentication systems to recreate a session id.
+  * Setting expiration time to sessions.
+  * Using HTTPS which relies on TLS protocol. TLS provides 3 security services to provide secure messaging over an unsecure channel.
+
 ## Different services TLS can provide
+
+* **Encryption** : is called encoding messages using both asymmetric and symmetric key encryption. These keys exchange happens as part of the process called TLS handshake.
+  * **TLS Handshake** is a process at the end of which a secure connection is being established.
+  * It takes place between the client and the server after the TCP handshake and before the initial communication starts.
+* **Authentication**: is the identity verification of the client/server during message exchange. This is achieved by the use of digitally signed certificates verifying the identity of one party. These certificates are issued by Certificate Authorities (CAs). This system works on chain of trust which eventually ends on highly trusted organisations issuing root certificates.
+  * **Certificate Authorities(CA)** issues a certificate to verify the identity of requesting party.
+  * **Chain of Trust** is a system starts from the digitally signed certificate verifies the id of the requesting party and ends at the highly trusted **Root certificate**. The first certificate in the chain is linked to certificates issued by Intermediate CAs. These issuers get their certificates from the Root CA. Root certificates are usually self-signed by the Root CA. The idea of the trust is to hide the private keys of the Root CAs hidden as possible in the chain like structure. In case of a leakage Root CA can drop Intermediate CA's certificate which invalidates all certificates issued by this Intermediate CA.
+* **Integrity** is called the process that detects if a message has been interfered or faked.
