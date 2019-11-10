@@ -16,7 +16,7 @@ Types of devices communicating over Internet and the software these devices use 
 * **Latency** is **the amount of time** that it takes for data to travel from one point to another.
 To determine the overall latency of a network connection we measure delay. There are different types of delay sum of which defines the 
 total latency. (*Propagation delay, Transmission delay, Processing delay, Queuing delay*).
-Latency is something that every software engineer need to take into account(and optimise) since it has a significant impact on performance of networked applications.
+Latency is something that every software engineer need to take into account(and optimise) since it has a significant impact on the performance of networked applications.
 * **Bandwidth** is **the amount of data** that can be transferred from a device at once.
 * **Bit rate** is **the amount of bits** that can be transferred by a device over a given period of time.
 * A **Network hop** is the transfer of data from one node to another. Data does not neccesarily follow a direct path on the network. It moves from one node to another (one network hop at a time) depending on network availability.
@@ -36,11 +36,12 @@ physical functionality where as **Physical layer at OSI** is the bottommost laye
 The Ethernet Protocol is the most commonly used protocol at this layer.
 PDU of this layer is called **Ethernet Frame**.
 Header of the PDU includes source and destination **MAC Addresses** which are the most important aspects of the data transfer with **Data  Payload**.
-* **The Transport Layer** is concerned of end-to-end communication between different processes and applications is achieved with reliability.
 * **The Internet/Network Layer** is the layer of protocols that are responsible for inter-network communication.
-  *  **OSI's Network layer(3)** and **TCP/IP's Internet Layer(2)** serves this function.
+  *  **OSI model's Network layer(3)** and **TCP/IP model's Internet Layer(2)** serves this function.
   * The most commonly used protocol is **IP (The Internet Protocol)**. PDU of this layer is called **Data Packets**.
   * Primary functions of this layer are; Encapsulating data into **Packets**, and routing through **IP Addressing**
+* **The Transport Layer** is concerned of end-to-end communication between different processes and applications is achieved with reliability.(TCP/IP Layer 3, OSI Layer 4)
+  * TCP/IP model uses **TCP(Transmission Control Protocol)** where as OSI model uses **UDP(User Datagram Protocol)**
 
 ## IP address and a port number
 
