@@ -120,7 +120,7 @@ After Three-way handshake sender starts sending the application data.
 
 * We use `?` character to mark the beginning of the **query string**.
 * `item=book` is a parameter name/value pair.
-* we can chain query paramters with `&` reserved character.
+* We can chain query paramters with `&` reserved character.
 
 ## URL encoding and its use
 
