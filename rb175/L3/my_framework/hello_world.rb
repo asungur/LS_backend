@@ -1,6 +1,8 @@
 # hello_world.rb
 # USE port 8080 with AWS
 
+require_relative 'advice'
+
 class HelloWorld
   def call(env)
     case env['REQUEST_PATH']
