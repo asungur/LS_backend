@@ -1,0 +1,6 @@
+<!doctype html>
+<% @users.each do |user, _| %>
+<ul>
+  <li><a href="/<%= user %>"><%= user %></a></li>
+</ul>
+<% end %>

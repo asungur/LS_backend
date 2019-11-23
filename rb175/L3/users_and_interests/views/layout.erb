@@ -1,0 +1,14 @@
+<!doctype html>
+<h3>Email:</h3>
+<p><%= @email %></p>
+
+<h3>Interests:</h3>
+<p><%= @interests.join(", ") %></p>
+
+<h4>Other users:</h4>
+<% @users.each do |user, _| %>
+  <% next if user == @user_name %>
+  <ul>
+    <li><a href="../<%= user %>"><%= user.capitalize %></a></li>
+  </ul>
+<% end %>

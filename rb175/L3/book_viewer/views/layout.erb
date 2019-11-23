@@ -1,34 +1,35 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <a href="/articles/<%= slugify(@title) %>"><%= @title %></a>
+    <title><%= @title %></title>
 
     <link rel="stylesheet" href="/stylesheets/pure-min.css">
     <link rel="stylesheet" href="/stylesheets/fonts.css">
     <link rel="stylesheet" href="/stylesheets/book_viewer.css">
-  </head>
+</head>
 
-  <body>
-    <div id="layout">
-      <a href="#menu" id="menuLink" class="menu-link"><span></span></a>
+<body>
+
+  <div id="layout">
+      <a href="#menu" id="menuLink" class="menu-link">
+          <span></span>
+      </a>
 
       <div id="menu">
-        <div class="pure-menu">
-          <a class="pure-menu-heading" href="/">Table of Contents</a>
+          <div class="pure-menu">
+              <a class="pure-menu-heading" href="/">Table of Contents</a>
 
-          <ul class="pure-menu-list">
-            <ul class="pure-menu-list">
-              <% @contents.each_with_index do |chapter, index| %>
+              <ul class="pure-menu-list">
+                <% @toc.each_with_index do |chapter, i| %>
                 <li class="pure-menu-item">
-                  <a href="/chapters/<%= index + 1 %>" class="pure-menu-link"><%= chapter %></a>
+                  <a href="/chapters/<%= i + 1 %>" class="pure-menu-link"><%= chapter %></a>
                 </li>
-              <% end %>
-            </ul>
-          </ul>
-        </div>
+                <% end %>
+              </ul>
+          </div>
       </div>
 
       <div id="main">
@@ -41,8 +42,8 @@
           <%= yield %>
         </div>
       </div>
-    </div>
+  </div>
 
-    <script type="text/javascript" src="javascripts/ui.js"></script>
-  </body>
+  <script type="text/javascript" src="/javascripts/ui.js"></script>
+</body>
 </html>
