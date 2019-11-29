@@ -8,6 +8,38 @@ configure do
   set :session_secret, 'secret'
 end
 
+helpers do
+  def list_complete?(list)
+    list[:todos].size > 0 && todos_remaining_count(list) == 0
+  end
+
+  def list_class(list)
+    "complete" if list_complete?(list)
+  end
+
+  def todos_count(list)
+    list[:todos].size
+  end
+
+  def todos_remaining_count(list)
+    list[:todos].select { |todo| !todo[:completed] }.size
+  end
+
+  def sort_lists(lists, &block)
+    complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
+    
+    incomplete_lists.each { |list| yield list, lists.index(list) }
+    complete_lists.each { |list| yield list, lists.index(list) }
+  end
+
+  def sort_todos(todos, &block)
+    complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
+    
+    incomplete_todos.each { |todo| yield todo, todos.index(todo) }
+    complete_todos.each { |todo| yield todo, todos.index(todo) }
+  end
+end
+
 before do
   session[:lists] ||= []
 end
@@ -31,7 +63,7 @@ end
 # Render the new list form
 get "/lists/new" do
   erb :new_list, layout: :layout
-end
+end 
 
 # Return an error message if the name is invalid. Return nil if name is valid.
 def error_for_list_name(name)
@@ -130,5 +162,29 @@ post "/lists/:list_id/todos/:id/destroy" do
   @list[:todos].delete_at(todo_id)
   session[:success] = "The todo has been deleted."
   redirect "/lists/#{@list_id}"
+end
 
+# Update the status of a todo
+post "/lists/:list_id/todos/:id" do
+  @list_id = params[:list_id].to_i
+  @list = session[:lists][@list_id]
+  
+  todo_id = params[:id].to_i
+  is_completed = params[:completed] == "true"
+  @list[:todos][todo_id][:completed] = is_completed
+  session[:success] = "The todo has been updated."
+  redirect "/lists/#{@list_id}"
+end
+
+# Mark all todos as complete for a list
+post "/lists/:id/complete_all" do
+  @list_id = params[:id].to_i
+  @list = session[:lists][@list_id]
+
+  @list[:todos].each do |todo|
+    todo[:completed] = true
+  end
+
+  session[:success] = "All todo have been completed."
+  redirect "/lists/#{@list_id}"
 end
