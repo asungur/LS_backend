@@ -10,23 +10,29 @@ class OCR
               " _ \n|_|\n|_|" => '8',
               " _ \n|_|\n _|" => '9' }
 
-  def initialize(string)
-    @input = string
+  def initialize(text)
+    @text = text
   end
-  
+
   def convert
-    unless garble?
-      chars = identify_chars
-      chars.map { |char| ocr_num(char) }.join
-    else
-      "?"
+    @text.split("\n\n").map do |text|
+      nums_as_binary_font(text).map do |num_as_binary_font|
+        NUMBERS[num_as_binary_font] || '?'
+      end.join
+    end.join(',')
+  end
+
+  private
+
+  def nums_as_binary_font(lines)
+    rows(lines).transpose.map do |num_as_binary_font_arr|
+      num_as_binary_font_arr.map { |line| line.join.center(3) }.join("\n")
     end
   end
 
-  def garble?
-    
-
-  def ocr_num(char)
-    NUMBERS[char.split("\n").map { |line| line.center(3) }.join("\n")]
+  def rows(lines)
+    lines.split("\n").map do |row|
+      row.center(3).chars.each_slice(3).to_a
+    end
   end
 end
