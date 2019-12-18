@@ -2,6 +2,9 @@ source "https://rubygems.org"
 
 gem "sinatra"
 gem "sinatra-contrib"
-gem "rack-test"
-gem "minitest"
+gem "erubis"
+gem "bcrypt"
 gem "redcarpet"
+
+gem "minitest"
+gem "rack-test"
