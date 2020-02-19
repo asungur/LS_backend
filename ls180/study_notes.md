@@ -51,7 +51,7 @@
     ```
 * Alteration synthax
     ```sql
->    ALTER TABLE table_name
+    ALTER TABLE table_name
     RENAME TO new_table_name                               # => changing table name
     RENAME COLUMN column1 TO column_new_name               # => changing column name
     ALTER COLUMN column1 TYPE new_data_type                # => changing column data type
