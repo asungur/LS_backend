@@ -1,7 +1,8 @@
 Personal collection of files, tutorials and notes taken during the courses at [Launchschool](https://launchschool.com/)
 
-| RB101 | Programming Foundations       |
+| No.   | Name                          |
 |-------|-------------------------------|
+| RB101 | Programming Foundations       |
 | RB120 | Object Oriented Programming   |
 | RB130 | Ruby Foundations: More Topics |
 | LS170 | Networking Foundations        |
