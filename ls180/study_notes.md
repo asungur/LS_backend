@@ -1,8 +1,8 @@
 # SQL
 
-   * SQL(Structure Query Language) is a declerative programming language used Relational Database Management Systems (RDBMS).
-   * Being declerative, a SQL statement does not specify how to do execute the operations, it only declares what needs to be done.
-   Details of the operation is handles by RDBMSs.
+   * SQL(Structure Query Language) is a declerative programming language used in Relational Database Management Systems (RDBMS).
+   * By being declerative, a SQL statement does not specify how to do execute the operations, it only declares what needs to be done.
+   Details of the operation is handled by RDBMSs.
    * Statement vs Query:
       * *SQL statement* is the command we use to access a database(schema) or the data contained within the database.
       * *SQL Query* is a subset of SQL statement. It allows us to search a database.
@@ -12,12 +12,25 @@
    * **Schema** refers to the organisational blueprint of how database is constructed. Table names, column's data types and their
    constraints are all components of *schema*.
    * **Data** is the actual information stored in the database in form of columns/rows.
-   * Increasing the number of columns could make the table harder to read and could increase data duplication. **normalization** is the    process(es) of distributing data into multiple tables and defining relationships between them to *improve data integrity*  and *reduce/eliminate duplication*
-   * **Keys** are types of constraints to define *relationships* and *uniqueness*. They are used to *identify a specific row in the current table* and *to refer to a specific row in another table*.
-   
+   * Increasing the number of columns could make the table harder to read and could increase data duplication. **normalization** is the    process of distributing data into multiple tables and defining relationships between them to *improve data integrity*  and *reduce/eliminate duplication*
+   * **Keys** are types of constraints used to define *relationships* and *uniqueness*. They are used to *identify a specific row in the current table* and *to refer to a specific row in another table*.
+   * Explaining basic components of a sql statement:
+     ```sql
+     school=# CREATE TABLE students (
+     id serial UNIQUE NOT NULL,
+     first_name varchar(25)
+     );
+     ```
+     * `school=#` demonstrates that we are connected to `school` database
+     * `CREATE TABLE` is a SQL keyword that used to create a new table
+     * `students` is the name of the table to be created
+     * `id` and `first_name` are the names of the columns
+     * `serial` and `varchar()` are the data type for each column
+     * `UNIQUE` and `NOT NULL` are two constraints for the `id` column.
+     * `;` semicolon is the end of the SQL statement
 
 * ### Explain the difference between INNER, LEFT OUTER, and RIGHT OUTER joins.
-   * `JOIN` clauses link two tables together. This is usually done using the keys that define the relationship different `JOIN` types allow us to query the information in different ways
+   * `JOIN` clauses link two tables together. This is usually done by using the keys that define the relationship. Different `JOIN` types allow us to query the information in different ways
    * `INNER JOIN` returns the intersection of the two tables on the given condition. If certain rows of one table are not represented in the other table they will not be included in the join table. If we dont specify the join type in our clause and use `JOIN` clause only, it will execute an inner join.
    * `LEFT OUTER JOIN` or `LEFT JOIN` it will take all the rows from the `LEFT` table regardless of data matching with the other table. 
      ```sql
@@ -42,9 +55,9 @@
 * ### Name and define the three sublanguages of SQL.
     * SQL consists of three sub-languages **DDL, DML, DCL**. Each sub-language operates a different aspect of database              interaction/manipulation. 
     * DDL(Data Definition Language) is used to set the underlying structure of a database including the tables contained in that database and columns inside it. (Ex: `CREATE`, `ALTER`, `DROP`)
-    * DML(Data Manipulation Language) contains commands that allows us to retrieve or modify the data stored within a database.
-    (Ex: `INSERT`, `SELECT`, `UPDATE`, `DELETE`)
-    * DCL(Data Control Language) is concerned with permission of different users when interacting with the database.
+    * DML(Data Manipulation Language) contains commands that allows us to retrieve or modify the data stored within a database table.
+    (Ex: `INSERT`, `SELECT`, `UPDATE`, `DELETE`). These also known as CRUD operations(Create, Read, Update, Delete). There are certain web application that interfaces to perform such operations. These type of applications are named *CRUD apps*.
+    * DCL(Data Control Language) is concerned with the permissions of different users when interacting with the database.
     
 * ### Write SQL statements using INSERT, UPDATE, DELETE, CREATE/ALTER/DROP TABLE, ADD/ALTER/DROP COLUMN.
     * Insertion synthax
@@ -89,7 +102,7 @@
     ```
     
 * ### Understand how to use GROUP BY, ORDER BY, WHERE, and HAVING.
-   * `ORDER BY` allows us to visualise data according to the value(s) of one or more columns. By default it sorts the data in ascending   order. This can be specified using `ASC` and `DESC` keywords. We can also sort using data from multiple columns. In this case, values     will be sorted in the given order
+   * `ORDER BY` allows us to visualise data according to the value(s) of one or more columns. By default it sorts the data in ascending   order. This can be specified by using `ASC` and `DESC` keywords. We can also sort using the data from multiple columns. In this case, values will be sorted in the given order
    ```sql
    SELECT * FROM table_name
    ORDER BY column1 DESC column 2 ASC; 
@@ -107,20 +120,21 @@
     3. `CHECK` constraint
 
 * ### Describe what a sequence is and what they are used for.
-  * **Sequence** is a relation that generates auto-incrementing numbers. It achieves this by remembering the last number it generated.
+  * **Sequence** is a relation that generates auto-incrementing numbers. It achieves this by remembering the last number that it is generated.
   It is commonly created as part of *serial* columns:
   ```sql
   CREATE TABLE table_name(
     id serial
     );
   ```
-  the line with `id serial` is actually implemented as
+  the line with `id serial` actually functions as
   ```sql
     id integer NOT NULL DEFAULT nextval('table_name_id_seq`);
   ```
   
 * ### Create an auto-incrementing column.
   ```sql
+  CREATE SEQUENCE table_name_sample_seq;
   CREATE TABLE table_name (
     sample integer DEFAULT nextval('table_name_sample_seq')
     );
@@ -138,14 +152,14 @@
 
 * ### Be able to describe what primary, foreign, natural, and surrogate keys are.
 * ### Create and remove foreign key constraints from a column.
-  * A **primary key** unique identifier for a row of data. It also enforces `NOT NULL` and `UNIQUE` constraints. Having a primary key column in every table is a common convention in certain software communities. However, this decision might differ to the project team.
+  * A **primary key** is a unique identifier for a row of data. It also enforces `NOT NULL` and `UNIQUE` constraints. Having a primary key column in every table is a common convention in certain software communities. However, this decision might differ to the project team.
     * ```sql
       ALTER TABLE table_name
       ADD PRIMARY KEY(column_name);
       ```
     * ```sql
       CREATE TABLE table_name(
-      column_name PRIMARY KEY
+      column_name data_type PRIMARY KEY
       );
       ```
   * **Foreign keys** used to relate a row in a table to another row in a different table. We achieve this by setting up a column as a foreign key and referencing this to another tables primary key column.
@@ -159,7 +173,7 @@
       column_name FOREIGN KEY REFERENCES target_table_name(column2_name) ON DELETE CASCADE
       );
       ```
-  * `ON DELETE CASCADE` is an important implementation detail for maintaining referential integrity. In case the reference row(with primary key - `column2_name` above) the referencing row(`column_name`) will be deleted too.
+  * `ON DELETE CASCADE` is an important implementation detail for maintaining referential integrity. In case the reference row(with primary key - `column2_name` above) gets deleted, the referencing row(`column_name`) will be deleted too.
   * Where a *key* is a broader term used for unique identifiers of a single row in a database table. There are two types of keys
   * **Natural keys** are the existing values in a table that can be used to identify a specific row. A good example can be a person's national ID number which is unique to a person.
   * **Surrogate keys** are values specifically defined to identify different rows in a database table. This type of keys have certain advantages to natural keys. Using more than one value to identify a row is called *composite key*.
@@ -182,6 +196,6 @@
 
 * ### Define cardinality and modality.
   * **Referential Integrity** is a database concept on relational data idealises that table relationships must be consistent. Different RDBMS'es implement different methods to enforce referential integrity. It is one of the key aspects to look after in database design.
-  * **Cardinality** is the number of items on each side of the relationship. Shown as (1:1, 1:M, M:M)
-  * **Modality** is the indication that if the relationship is required or not. Shown as (1) - required / (0) - optional
+  * **Cardinality** is the number of items on each side of the relationship. Shown as (1:1, 1:M, M:M). For instance, in a one-to-many relationship, the cardinality of this relationship is going to be 1 and many. Cardinality sets the upper limit of the connections for each side.
+  * **Modality** is the indication that if the relationship is required or not. Shown as (1) - required / (0) - optional. Again giving a one-to-many relationship as an example, 
 * ### Be able to draw database diagrams using crow's foot notation.
