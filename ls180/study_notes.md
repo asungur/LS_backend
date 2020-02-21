@@ -4,19 +4,40 @@
    * Being declerative, a SQL statement does not specify how to do execute the operations, it only declares what needs to be done.
    Details of the operation is handles by RDBMSs.
    * Statement vs Query:
-      * SQL statement is the command we use to access a database(schema) or the data contained within the database.
-       * SQL Query is a subset of SQL statement. It allows us to search a database.
-   * Relational database refers to a structured set of data in the same relational model.
+      * *SQL statement* is the command we use to access a database(schema) or the data contained within the database.
+      * *SQL Query* is a subset of SQL statement. It allows us to search a database.
+   * Relational database refers to a structured set of data in the same relational model. They persist data in a set of relations.
+    * **Relation** is a table consist of columns and rows
+    * **Relationship** is the link between the rows of data(entity). This is the result of the data type of the entity and how it is related to other entities.
    * **Schema** refers to the organisational blueprint of how database is constructed. Table names, column's data types and their
    constraints are all components of *schema*.
    * **Data** is the actual information stored in the database in form of columns/rows.
+   * Increasing the number of columns could make the table harder to read and could increase data duplication. **normalization** is the    process(es) of distributing data into multiple tables and defining relationships between them to *improve data integrity*  and *reduce/eliminate duplication*
+   * **Keys** are types of constraints to define *relationships* and *uniqueness*. They are used to *identify a specific row in the current table* and *to refer to a specific row in another table*.
+   
 
 * ### Explain the difference between INNER, LEFT OUTER, and RIGHT OUTER joins.
-   * Join is .....
-   * `INNER JOIN`
-   * `LEFT OUTER JOIN`
-   * `FULL JOIN`
-
+   * `JOIN` clauses link two tables together. This is usually done using the keys that define the relationship different `JOIN` types allow us to query the information in different ways
+   * `INNER JOIN` returns the intersection of the two tables on the given condition. If certain rows of one table are not represented in the other table they will not be included in the join table. If we dont specify the join type in our clause and use `JOIN` clause only, it will execute an inner join.
+   * `LEFT OUTER JOIN` or `LEFT JOIN` it will take all the rows from the `LEFT` table regardless of data matching with the other table. 
+     ```sql
+     SELECT table1.*, table2.*
+     FROM table1
+     LEFT JOIN table2
+     ON (table1.id = table2.data_id);
+     ```
+     In the above example table1 is the left table of the join and its all rows will be included.
+     
+   * `RIGHT OUTER JOIN` or `RIGHT JOIN` is the same as `LEFT JOIN` except the roles of the tables are swapped.
+     ```sql
+     SELECT table1.*, table2.*
+     FROM table1
+     RIGHT JOIN table2
+     ON (table1.id = table2.data_id);
+     ```
+     All rows of the table2 will included.
+     
+   * `FULL JOIN` or `FULL OUTER JOIN` is the combination of both. All rows of both tables will return. Unmatching data will be represented as `NULL`
 
 * ### Name and define the three sublanguages of SQL.
     * SQL consists of three sub-languages **DDL, DML, DCL**. Each sub-language operates a different aspect of database              interaction/manipulation. 
@@ -78,15 +99,89 @@
 
 # PostgreSQL
 
-* PostgreSQL is a RDBMS(an application for managing relational databases).
-* It has client-server architecture
+  * PostgreSQL is a RDBMS(an application for managing relational databases).
+  * It has client-server architecture
+  * There are 3 ways to restrict data in a column using schema.
+    1. Data type
+    2. `NOT NULL` constraint
+    3. `CHECK` constraint
 
 * ### Describe what a sequence is and what they are used for.
+  * **Sequence** is a relation that generates auto-incrementing numbers. It achieves this by remembering the last number it generated.
+  It is commonly created as part of *serial* columns:
+  ```sql
+  CREATE TABLE table_name(
+    id serial
+    );
+  ```
+  the line with `id serial` is actually implemented as
+  ```sql
+    id integer NOT NULL DEFAULT nextval('table_name_id_seq`);
+  ```
+  
 * ### Create an auto-incrementing column.
+  ```sql
+  CREATE TABLE table_name (
+    sample integer DEFAULT nextval('table_name_sample_seq')
+    );
+  ```
+  
 * ### Define a default value for a column.
+  ```sql
+  CREATE TABLE table_name (
+    column_name integer DEFAULT 0
+    );
+  ```
+  ```sql
+  ALTER TABLE table_name ALTER COLUMN column_name SET DEFAULT 0;
+  ```
+
 * ### Be able to describe what primary, foreign, natural, and surrogate keys are.
-* ### Create and remove CHECK constraints from a column.
 * ### Create and remove foreign key constraints from a column.
+  * A **primary key** unique identifier for a row of data. It also enforces `NOT NULL` and `UNIQUE` constraints. Having a primary key column in every table is a common convention in certain software communities. However, this decision might differ to the project team.
+    * ```sql
+      ALTER TABLE table_name
+      ADD PRIMARY KEY(column_name);
+      ```
+    * ```sql
+      CREATE TABLE table_name(
+      column_name PRIMARY KEY
+      );
+      ```
+  * **Foreign keys** used to relate a row in a table to another row in a different table. We achieve this by setting up a column as a foreign key and referencing this to another tables primary key column.
+    * ```sql
+      ALTER TABLE table_name 
+      ADD FOREIGN_KEY(column_name)
+      REFERENCES target_table_name(column2_name);
+      ```
+    * ```sql
+      CREATE TABKE table_name(
+      column_name FOREIGN KEY REFERENCES target_table_name(column2_name) ON DELETE CASCADE
+      );
+      ```
+  * `ON DELETE CASCADE` is an important implementation detail for maintaining referential integrity. In case the reference row(with primary key - `column2_name` above) the referencing row(`column_name`) will be deleted too.
+  * Where a *key* is a broader term used for unique identifiers of a single row in a database table. There are two types of keys
+  * **Natural keys** are the existing values in a table that can be used to identify a specific row. A good example can be a person's national ID number which is unique to a person.
+  * **Surrogate keys** are values specifically defined to identify different rows in a database table. This type of keys have certain advantages to natural keys. Using more than one value to identify a row is called *composite key*.
+  
+* ### Create and remove CHECK constraints from a column.
+  * ```sql
+    ALTER TABLE table_name
+    ADD CONSTRAINT constraint_name
+    CHECK (length(column_name) >= 5);
+    ```
+  * ```sql
+    ALTER TABLE table_name
+    DROP CONSTRAINT constraint_name;
+    ```
+    
 # Database Diagrams
+  * **Conceptual**, logical and **Physical** schema
+  * ERD(Entity-Relationship diagram)
+  * **Update anomaly** vs **Insertion anomaly** and **Normalization** (and *denormalization*).
+
 * ### Define cardinality and modality.
+  * **Referential Integrity** is a database concept on relational data idealises that table relationships must be consistent. Different RDBMS'es implement different methods to enforce referential integrity. It is one of the key aspects to look after in database design.
+  * **Cardinality** is the number of items on each side of the relationship. Shown as (1:1, 1:M, M:M)
+  * **Modality** is the indication that if the relationship is required or not. Shown as (1) - required / (0) - optional
 * ### Be able to draw database diagrams using crow's foot notation.
