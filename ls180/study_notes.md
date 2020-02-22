@@ -6,9 +6,9 @@
    * Statement vs Query:
       * *SQL statement* is the command we use to access a database(schema) or the data contained within the database.
       * *SQL Query* is a subset of SQL statement. It allows us to search a database.
-   * Relational database refers to a structured set of data in the same relational model. They persist data in a set of relations.
-    * **Relation** is a table consist of columns and rows
-    * **Relationship** is the link between the rows of data(entity). This is the result of the data type of the entity and how it is related to other entities.
+   * Relational database refers to a structured set of data in the same relational model. They persist data in a set of relations
+      * **Relation** is a table consist of columns and rows
+      * **Relationship** is the link between the rows of data(entity). This is the result of the data type of the entity and how it is related to other entities.
    * **Schema** refers to the organisational blueprint of how database is constructed. Table names, column's data types and their
    constraints are all components of *schema*.
    * **Data** is the actual information stored in the database in form of columns/rows.
