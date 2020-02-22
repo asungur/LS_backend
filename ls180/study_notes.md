@@ -85,7 +85,7 @@
     column1_name column1_data_type CONSTRAINTS
     );
     ```
-   * Alteration synthax
+   * Addition/Alteration synthax
     ```sql
     ALTER TABLE table_name
     RENAME TO new_table_name                               # => changing table name
@@ -118,6 +118,12 @@
     1. Data type
     2. `NOT NULL` constraint
     3. `CHECK` constraint
+  * A Subquery or Nested query refers to a query placed within another query
+    ```sql
+    SELECT *.col1 FROM table_1
+    WHERE table_1.id IN (SELECT table_2.id FROM table_2);
+    ```
+  It is quite common that instead of `JOIN`s we can use subqueries. Keeping the computational cost in mind, there are multiple ways to query the same information since SQL is a declerative language where we specify what operations needs to be done, not how to do it.
 
 * ### Describe what a sequence is and what they are used for.
   * **Sequence** is a relation that generates auto-incrementing numbers. It achieves this by remembering the last number that it is generated.
@@ -131,6 +137,11 @@
   ```sql
     id integer NOT NULL DEFAULT nextval('table_name_id_seq`);
   ```
+  * An example on how to extract year for a date data type.
+  ```sql
+  SELECT extract( year FROM CURRENT_DATE )::int;
+  ```
+  * Other useful commands to to look at, `CAST`, `STR_AGG`, `substring( "string", from 1 to 2)`
   
 * ### Create an auto-incrementing column.
   ```sql
@@ -175,8 +186,8 @@
       ```
   * `ON DELETE CASCADE` is an important implementation detail for maintaining referential integrity. In case the reference row(with primary key - `column2_name` above) gets deleted, the referencing row(`column_name`) will be deleted too.
   * Where a *key* is a broader term used for unique identifiers of a single row in a database table. There are two types of keys
-  * **Natural keys** are the existing values in a table that can be used to identify a specific row. A good example can be a person's national ID number which is unique to a person.
-  * **Surrogate keys** are values specifically defined to identify different rows in a database table. This type of keys have certain advantages to natural keys. Using more than one value to identify a row is called *composite key*.
+  * **Natural keys** are the existing values in a table that can be used to identify a specific row. For instance, let's assume we a table contains different information for individuals. In such a table, "national ID number" column can be used as a natural key since it is unique to every individual.
+  * **Surrogate keys** are values specifically defined to identify different rows in a database table. This type of keys have certain advantages over natural keys. A good example to surrogate key is the `id` column that we commonly use. During table creation we usually ensure that this column is auto-incrementing, not null and unique. By using *surrogate keys* in our queries we ensure that data we are getting is coming from the column we specify. Also, using more than one value to identify a row is called *composite key*.
   
 * ### Create and remove CHECK constraints from a column.
   * ```sql
@@ -197,5 +208,6 @@
 * ### Define cardinality and modality.
   * **Referential Integrity** is a database concept on relational data idealises that table relationships must be consistent. Different RDBMS'es implement different methods to enforce referential integrity. It is one of the key aspects to look after in database design.
   * **Cardinality** is the number of items on each side of the relationship. Shown as (1:1, 1:M, M:M). For instance, in a one-to-many relationship, the cardinality of this relationship is going to be 1 and many. Cardinality sets the upper limit of the connections for each side.
-  * **Modality** is the indication that if the relationship is required or not. Shown as (1) - required / (0) - optional. Again giving a one-to-many relationship as an example, 
+  * **Modality** is the indication that if the relationship is required or not. Shown as (1) - required / (0) - optional. We can also think this as the minimum number of connections for each side.
 * ### Be able to draw database diagrams using crow's foot notation.
+  * Crow's foor notation is an approach used in drawing Entity Relationship Diagrams(ERD). It is concerned with the conceptual schema and demonstrates *cardinality* and *modality* of the relationships between different tables.
