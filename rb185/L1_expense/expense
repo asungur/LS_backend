@@ -1,0 +1,20 @@
+#! /usr/bin/env ruby
+
+require "pg"
+
+
+
+def list_expenses
+  connection = PG.connect(dbname: "expenses")
+  results = connection.exec("SELECT * FROM expenses ORDER BY created_on ASC")
+
+  results.each_row do |row|
+    padding = 20
+    columns = [ row[0].center(3),
+                row[1].center(padding),
+                row[2].center(padding),
+                row[3].center(padding) ]
+
+    puts columns.join(" | ")
+  end
+end
