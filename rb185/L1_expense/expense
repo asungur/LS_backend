@@ -1,52 +1,83 @@
 #! /usr/bin/env ruby
 
 require "pg"
-CONNECTION = PG.connect(dbname: "expenses")
 
-def list_expenses
-  results = CONNECTION.exec("SELECT * FROM expenses ORDER BY created_on ASC")
+class ExpenseData
+  def initialize
+    @connection = PG.connect(dbname: "expenses")
+  end
 
-  results.each_row do |row|
-    padding = 20
-    columns = [ row[0].center(3),
-                row[1].center(padding),
-                row[2].center(padding),
-                row[3].center(padding) ]
+  def add_expense(amount, memo)
+    date = Date.today
+    command = "INSERT INTO expenses(amount, memo, created_on) VALUES ($1, $2, $3)"
+    @connection.exec_params(command, [amount, memo, date])
+  end
 
-    puts columns.join(" | ")
+  def list_expenses
+    results = @connection.exec("SELECT * FROM expenses ORDER BY created_on ASC")
+
+    display_expenses(results)
+  end
+
+  def search_expenses(keyword)
+    command = "SELECT * FROM expenses WHERE memo ILIKE $1"
+    results = @connection.exec_params(command, ["%#{keyword}%"])
+
+    display_expenses(results)
+  end
+
+  private
+
+  def display_expenses(expenses)
+    expenses.each_row do |row|
+      padding = 20
+      columns = [ row[0].center(3),
+                  row[1].center(padding),
+                  row[2].center(padding),
+                  row[3].center(padding) ]
+  
+      puts columns.join(" | ")
+    end
   end
 end
 
-def display_help
-  puts <<~HELP
-    An expense recording system
+class CLI
+  def initialize
+    @application = ExpenseData.new
+  end
 
-    Commands:
+  def display_help
+    puts <<~HELP
+      An expense recording system
+  
+      Commands:
+  
+      add AMOUNT MEMO [DATE] - record a new expense
+      clear - delete all expenses
+      list - list all expenses
+      delete NUMBER - remove expense with id NUMBER
+      search QUERY - list expenses with a matching memo field
+    HELP
+  end
 
-    add AMOUNT MEMO [DATE] - record a new expense
-    clear - delete all expenses
-    list - list all expenses
-    delete NUMBER - remove expense with id NUMBER
-    search QUERY - list expenses with a matching memo field
-  HELP
+  def run(arguments)
+    command = arguments.shift
+    case command
+    when "list"
+      @application.list_expenses
+    when "add"
+      amount  = arguments[0]
+      memo = arguments[1]
+      abort "You must provide an amount and memo." unless amount && memo
+      @application.add_expense(amount,memo)
+    when "search"
+      keyword = arguments[0]
+      abort "You must provide a keyword." unless keyword
+      @application.search_expenses(keyword)
+    else
+      display_help
+    end
+  end
 end
 
-def add_expense(amount, memo)
-  date = Date.today
-  command = "INSERT INTO expenses(amount, memo, created_on) VALUES ($1, $2, $3)"
-  CONNECTION.exec_params(command, [amount, memo, date])
-end
-
-
-command = ARGV.first
-case command
-when "list"
-  list_expenses
-when "add"
-  amount  = ARGV[1]
-  memo = ARGV[2]
-  abort "You must provide and amount and memo." unless amount && memo
-  add_expense(amount,memo)
-else
-  display_help
-end
+CLI.new.run(ARGV)
