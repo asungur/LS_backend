@@ -1,10 +1,12 @@
 #! /usr/bin/env ruby
 
 require "pg"
+require "io/console"
 
 class ExpenseData
   def initialize
     @connection = PG.connect(dbname: "expenses")
+    setup_schema
   end
 
   def add_expense(amount, memo)
@@ -16,17 +18,59 @@ class ExpenseData
   def list_expenses
     results = @connection.exec("SELECT * FROM expenses ORDER BY created_on ASC")
 
-    display_expenses(results)
+    display_count(results)
+    display_expenses(results) if results.ntuples > 0
   end
 
   def search_expenses(keyword)
     command = "SELECT * FROM expenses WHERE memo ILIKE $1"
     results = @connection.exec_params(command, ["%#{keyword}%"])
-
+  
+    display_count(results)
     display_expenses(results)
   end
 
+  def delete_expense(id)
+    command = "SELECT * FROM expenses WHERE id = $1"
+    result = @connection.exec_params(command, [id])
+
+    if result.ntuples == 1
+      command = "DELETE FROM expenses WHERE id=$1"
+      @connection.exec_params(command, [id])
+
+      puts "The following expense has been deleted:"
+      display_expenses(result)
+    else
+      puts "There is no expense with the id '#{id}'."
+    end
+  end
+
+  def delete_all_expenses
+    command = "DELETE FROM expenses"
+    @connection.exec(command)
+    puts "All expenses have been deleted"
+  end
+
   private
+
+  def setup_schema
+    command = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'expenses';"
+    check = @connection.exec(command)
+    if check[0]["count"].to_i == 0
+      sql_file = File.open("schema.sql", 'rb'){ |file| file.read }
+      @connection.exec(sql_file)
+      puts "The table \"expenses\" has been created"
+    end
+  end
+
+  def display_count(expenses)
+    count = expenses.ntuples
+    if count == 0
+      puts "There are no expenses"
+    else
+      puts "There are #{count} expense#{"s" if count != 1}."
+    end
+  end
 
   def display_expenses(expenses)
     expenses.each_row do |row|
@@ -38,6 +82,11 @@ class ExpenseData
   
       puts columns.join(" | ")
     end
+    puts "-" * 90
+
+    amount_sum = expenses.field_values("amount").map(&:to_f).inject(:+)
+
+    puts "Total #{amount_sum.to_s.rjust(12)}"
   end
 end
 
@@ -74,6 +123,12 @@ class CLI
       keyword = arguments[0]
       abort "You must provide a keyword." unless keyword
       @application.search_expenses(keyword)
+    when "delete"
+      @application.delete_expense(arguments[0])
+    when "clear"
+      puts "This will remove all expenses. Are you sure?(y/n)"
+      response = $stdin.getch
+      @application.delete_all_expenses if response == "y"
     else
       display_help
     end
