@@ -5,12 +5,14 @@
 # array.select { |num| num + 1 }        # => [1, 2, 3, 4, 5], because "num + 1" evaluates to true
 
 
-def select(array)
+def select(arr)
   return_arr = []
-  counter = 0
-  while counter < array.size
-    return_arr << array[counter] if yield(array[counter])
-    counter +=1
+  iter = 0
+  while iter < arr.length do
+    if block_given?
+      return_arr << arr[iter] if !!yield(arr[iter])
+    end
+    iter += 1
   end
   return_arr
 end
